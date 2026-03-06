@@ -58,13 +58,15 @@ public class MenuItemService {
             new MenuItemVo("학사일정", "/Board/boardCalendar.bo"),
             new MenuItemVo("중고책방", "/Book/bookpostboard.bo?center=/view_student/booktradingboard.jsp"),
             new MenuItemVo("중고서점 찾아보기", "/Board/bookShopMap.bo"),
-            new MenuItemVo("이메일 보내기", "/student/email.bo")
+            new MenuItemVo("이메일 보내기", "/student/email.bo"),
+            new MenuItemVo("채팅", "/member/chat.bo")
         ));
 
         // 교수 메뉴
         roleMenuMap.put("교수", Arrays.asList(
             new MenuItemVo("강의실", "/classroom/classroom.bo?classroomCenter=professorMyCourse.jsp"),
-            new MenuItemVo("공지 사항", "/Board/list.bo?center=/common/notice/list.jsp")
+            new MenuItemVo("공지 사항", "/Board/list.bo?center=/common/notice/list.jsp"),
+            new MenuItemVo("채팅", "/member/chat.bo")
         ));
         
 	}

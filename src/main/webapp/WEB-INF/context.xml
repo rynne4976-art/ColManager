@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Host name="localhost"  appBase="webapps" unpackWARs="true" autoDeploy="true">
+<Context path="/" docBase="EduManager" reloadable="true">
+
+	<Resource
+    	name = "jdbc/jspbeginner"
+    	auth = "Container"
+    	type = "javax.sql.DataSource"
+    	driverClassName = "com.mysql.jdbc.Driver"
+    	username = "root"
+    	password = "1234"
+    	maxActive = "50"
+    	maxWait = "-1"
+    	url = "jdbc:mysql://localhost:3306/edumanager"
+    /> 
+	
+</Context>
+<Context docBase="C:/Users/602/EduManagerImage" path="/EduManagerImage" />
+</Host>

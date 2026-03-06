@@ -1,0 +1,94 @@
+/* startpage.css */
+
+/* 배경 이미지 */
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/background/mainPage_Background.jpeg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    filter: blur(8px);
+    background-attachment: fixed;
+    overflow: hidden;
+}
+
+/* HTML, Body 기본 설정 */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* 전체 페이지의 요소 크기를 10% 줄이기 */
+.container-content,
+.container {
+    transform: scale(0.8); /* 크기를 90%로 축소 */
+    transform-origin: center top; /* 좌상단을 기준으로 축소 */
+}
+
+
+/* 레이아웃 설정 */
+.container-content {
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(0px);
+}
+
+/* 기본 높이 설정 */
+.reduced-height {
+    height: 360px; /* 높이를 10% 줄이기 */
+    overflow-y: auto;
+}
+
+/* 개별 요소의 기본 크기 조정 */
+.container {
+    width: 80%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.banner,
+.login-form,
+.calendar,
+.announcement {
+    max-width: 450px;
+    font-size: 0.9rem;
+}
+
+
+
+/* 날짜 셀의 너비 조정 */
+.fc-daygrid-day {
+    width: 92px !important; /* 각 셀의 너비 설정 */
+}
+
+/* 요일 헤더 셀의 너비 조정 */
+.fc-col-header-cell {
+    width: 92px !important; /* 요일 헤더 셀의 너비 설정 */
+    text-align: center; /* 요일 텍스트 가운데 정렬 */
+}
+
+/* 달력 테이블 전체 너비 조정 */
+.fc-daygrid {
+    width: auto !important;
+    display: table;
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+/* 반응형 레이아웃 - 작은 화면에서 원래 크기 유지 */
+@media (max-width: 768px) {
+    .container-content,
+    .container,
+    .banner,
+    .login-form,
+    .calendar,
+    .announcement {
+        transform: scale(1); /* 모바일에서는 원래 크기 유지 */
+    }
+}

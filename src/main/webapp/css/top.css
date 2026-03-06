@@ -1,0 +1,183 @@
+	    /* 네비게이션 요소 수직 및 수평 중앙 정렬 */
+	    .nav-container {
+	        display: flex;
+	        justify-content: center;  /* 수평 중앙 정렬 */
+	        align-items: center;      /* 수직 중앙 정렬 */
+	    }
+    
+	    /* 요소 간 간격 조정 */
+		.navbar-nav .nav-item {
+		    margin: 0 70px; /* 요소 간 간격 설정 */
+		}
+		
+		/* 네비게이션 바 전체 중앙 정렬 */
+		.navbar {
+		    display: flex; /* flexbox를 사용하여 중앙 정렬 */
+		    justify-content: center;
+		    /* margin-bottom: 150px; */
+		    text-align: center;
+		}
+		
+		/* 전체 메뉴 리스트 스타일 */
+		.navbar-nav ul {
+		    display: inline-block; /* ul 요소를 inline-block으로 설정하여 text-align의 영향을 받도록 함 */
+		    list-style-type: none; /* 기본 불릿 제거 */
+		    padding: 0;
+		    margin: 0;
+		}
+		
+		/* 상위 메뉴 항목 스타일 */
+		.navbar-nav > ul > li {
+		    display: inline-block;
+		    margin-right: 100px;
+		    position: relative;
+		}
+		
+		/* 마지막 li의 오른쪽 여백 제거 */
+		.navbar-nav > ul > li:last-child {
+		    margin-right: 0;
+		}
+
+        .navbar-nav > ul > li > a {
+            color: #ffffff;
+            font-size: 1.2em;
+            text-decoration: none;
+        }
+
+        .navbar-nav > ul > li > a:hover {
+            color: #007bff; /* 마우스 오버 시 색상 변경 */
+        }
+
+        /* 하위 메뉴 리스트 스타일 */
+		.navbar-nav ul ul {
+		    display: none; /* 기본적으로 숨김 */
+		    position: absolute;
+		    top: 100%;
+		    left: 50%; /* 상위 메뉴 항목의 중앙에 위치 */
+		    transform: translateX(-50%); /* 중앙으로 이동 */
+		    background-color: #343a40;
+		    padding: 10px;
+		    border-radius: 5px;
+		    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+		    min-width: 150px;
+		    min-height: 200px;
+		}
+
+        /* 하위 메뉴 항목 스타일 */
+        .navbar-nav ul ul li {
+            margin: 5px 0;
+        }
+
+        .navbar-nav ul ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .navbar-nav ul ul li a:hover {
+            color: #007bff; /* 마우스 오버 시 색상 변경 */
+        }
+
+        /* 상위 메뉴 항목에 마우스를 올리면 하위 메뉴 표시 */
+        .navbar-nav > ul > li:hover > ul {
+            display: block;
+        }
+        
+		/* 사이드바 기본 스타일 */
+	    .offcanvas-body {
+	        background-color: #f8f9fa;
+	        padding: 20px;
+	    }
+	
+	    /* 리스트 그룹 스타일 */
+	    .list-group {
+	        padding: 0;
+	        margin: 0;
+	        list-style-type: none;
+	    }
+	
+	    /* 상위 메뉴 스타일 - 색상별로 다른 배경 적용 */
+	    .list-group > li {
+	        margin-bottom: 20px;
+	        padding: 15px;
+	        font-size: 1.2em;
+	        font-weight: bold;
+	        color: #ffffff;
+	        border-radius: 8px;
+	        position: relative;
+	        transition: transform 0.3s;
+	    }
+	
+	    /* 각 상위 메뉴 색상 및 하위 메뉴 스타일링 */
+	    /* 사용자 관리 */
+	    .list-group > li:nth-child(1) {
+	        background-color: #007bff;
+	    }
+	
+	    .list-group > li:nth-child(1) ul {
+	        background-color: #cce5ff;
+	        border-radius: 5px;
+	        padding: 10px;
+	        margin-top: 10px;
+	    }
+	
+	    /* 학사 관리 */
+	    .list-group > li:nth-child(2) {
+	        background-color: #28a745;
+	    }
+	
+	    .list-group > li:nth-child(2) ul {
+	        background-color: #d4edda;
+	        border-radius: 5px;
+	        padding: 10px;
+	        margin-top: 10px;
+	    }
+	
+	    /* 정보 관리 */
+	    .list-group > li:nth-child(3) {
+	        background-color: #ff5722;
+	    }
+	
+	    .list-group > li:nth-child(3) ul {
+	        background-color: #ffd8cc;
+	        border-radius: 5px;
+	        padding: 10px;
+	        margin-top: 10px;
+	    }
+	
+	    /* 상위 메뉴 호버 시 효과 */
+	    .list-group > li:hover {
+	        transform: scale(1.02);
+	    }
+	
+	    /* 상위 메뉴 텍스트 색상 */
+	    .list-group > li > a {
+	        color: #ffffff;
+	        text-decoration: none;
+	        display: block;
+	    }
+	
+	    /* 하위 메뉴 항목 스타일 */
+	    .list-group ul li {
+	        font-size: 1em;
+	        margin-bottom: 8px;
+	        padding: 5px;
+	    }
+	
+	    .list-group ul li a {
+	        color: #495057;
+	        text-decoration: none;
+	        display: block;
+	        border-radius: 5px;
+	        transition: background-color 0.3s;
+	    }
+	
+	    .list-group ul li a:hover {
+	        background-color: #e2e6ea;
+	        color: #0056b3;
+	    }
+	
+	    /* 큰 항목 하위 메뉴 표시 */
+	    .list-group > li:hover > ul {
+	        display: block;
+	    }

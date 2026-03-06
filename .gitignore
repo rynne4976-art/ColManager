@@ -1,0 +1,28 @@
+# Eclipse 설정 (각 PC마다 달라서 공유하면 오류!)
+.settings/
+.project
+.classpath
+
+# 컴파일 결과물 (빌드하면 자동 생성)
+bin/
+build/
+target/
+*.class
+*.war
+*.ear
+
+# Tomcat 서버 관련
+.tomcat/
+work/
+Servers/
+
+# OS 자동 생성 파일
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# 기타 IDE 설정
+*.iml
+.idea/
+.vscode/
+*.log

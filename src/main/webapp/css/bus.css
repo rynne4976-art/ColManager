@@ -1,53 +1,79 @@
 body{
 
 font-family:Arial;
-background:#f4f6f9;
+background:linear-gradient(135deg,#7aa7d9,#a6c5e8);
 margin:0;
-padding:0;
 
 }
 
 .container{
 
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-height:100vh;
-
-}
-
-.title{
-
-margin-bottom:30px;
-
-}
-
-.bus-box{
-
-width:300px;
+width:800px;
+margin:50px auto;
 background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
-text-align:center;
-margin-top:20px;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+
+}
+
+h1{
+
+margin-bottom:20px;
 
 }
 
 .btn{
 
 padding:10px 20px;
+background:#4b82d9;
 border:none;
-background:#007bff;
 color:white;
-border-radius:5px;
+border-radius:10px;
 cursor:pointer;
 
 }
 
-.btn:hover{
+table{
 
-background:#0056b3;
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+
+}
+
+th,td{
+
+padding:10px;
+border-bottom:1px solid #ddd;
+
+}
+
+.recommend{
+
+margin-top:30px;
+padding:20px;
+background:#f0f6ff;
+border-radius:15px;
+
+}
+
+.busTime{
+
+font-size:40px;
+font-weight:bold;
+
+}
+
+.busRoute{
+
+font-size:20px;
+
+}
+
+.remain{
+
+color:#2a6edc;
+font-weight:bold;
 
 }

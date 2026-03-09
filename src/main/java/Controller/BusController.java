@@ -15,12 +15,15 @@ public class BusController extends HttpServlet {
 
         BusService service = new BusService();
 
-        // 추천 버스 계산
-        String[] busInfo = service.recommendBus();
+        // 시간표 가져오기
+        request.setAttribute("schedule", service.getSchedule());
 
-        request.setAttribute("busRoute", busInfo[0]);
-        request.setAttribute("busTime", busInfo[1]);
-        request.setAttribute("remainTime", busInfo[2]);
+        // 추천 버스 계산
+        String[] bus = service.recommendBus();
+
+        request.setAttribute("busTime", bus[0]);
+        request.setAttribute("busRoute", bus[1]);
+        request.setAttribute("remainTime", bus[2]);
 
         request.getRequestDispatcher("/view_start/startcenter.jsp")
                 .forward(request, response);

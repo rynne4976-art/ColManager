@@ -652,10 +652,12 @@ public class ClassroomDAO {
 				closeResource(); // 자원 해제
 			}
 		}
-		
 
-		
-		 
+	// 성적 다운로드용 조회
+	public ArrayList<StudentVo> gradeDownload(String student_id) {
+		return gradeSearch(student_id);
+	}
+
 	// 성적 조회
 	public ArrayList<StudentVo> gradeSearch(String student_id_1) {
 		

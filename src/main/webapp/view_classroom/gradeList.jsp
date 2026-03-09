@@ -32,6 +32,58 @@
 <body class="bg-light">
     <main class="container my-5">
         <h2 class="text-center mb-4">성적 목록</h2>
+        
+        <div class="d-flex justify-content-end mb-3">
+            <form id="excelDownloadForm" action="<%=contextPath%>/classroom/download.do" method="get" target="downloadFrame" style="margin:0;">
+                <button type="submit" class="btn btn-green">성적 엑셀 다운로드</button>
+            </form>
+            <iframe name="downloadFrame" style="display:none;"></iframe>
+        </div>
+
+        <script>
+            (function(){
+                let form = document.getElementById("excelDownloadForm");
+                let polling = null;
+
+                function getCookie(name){
+                    let cookies = document.cookie ? document.cookie.split('; ') : [];
+                    for(let i=0;i<cookies.length;i++){
+                        let parts = cookies[i].split('=');
+                        let key = parts[0];
+                        let value = parts.slice(1).join('=');
+                        if(key === name) return decodeURIComponent(value);
+                    }
+                    return "";
+                }
+
+                function clearCookie(name){
+                    document.cookie = name + "=; path=/; max-age=0";
+                }
+
+                function startPolling(){
+                    if(polling) clearInterval(polling);
+                    polling = setInterval(function(){
+                        let status = getCookie("fileDownloadStatus");
+                        if(status === "success"){
+                            clearInterval(polling);
+                            clearCookie("fileDownloadStatus");
+                            alert("다운로드에 성공했습니다.");
+                        }else if(status === "fail"){
+                            clearInterval(polling);
+                            clearCookie("fileDownloadStatus");
+                            alert("다운로드에 실패했습니다.");
+                        }
+                    }, 500);
+                }
+
+                if(form){
+                    form.addEventListener("submit", function(){
+                        startPolling();
+                    });
+                }
+            })();
+        </script>
+
         <div class="card shadow-sm">
             <div class="card-body">
                 <table class="table table-bordered table-hover text-center align-middle">

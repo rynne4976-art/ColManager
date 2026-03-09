@@ -187,6 +187,15 @@ public class MemberController extends HttpServlet {
             
         // ==========================================================================================
 
+        // 채팅방으로 이동
+        case "/chat.bo":
+            center = "/view_chat/chatRoom.jsp";
+            request.setAttribute("center", center);
+            nextPage = "/main.jsp";
+            break;
+
+        // ==========================================================================================
+
         default:
             nextPage = "/main.jsp";
             break;

@@ -24,6 +24,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Cell;
+import javax.servlet.http.Cookie;
+import javax.servlet.ServletOutputStream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -445,6 +457,119 @@ public class ClassroomController extends HttpServlet {
 	    
   	    //==========================================================================================
 	    		
+	    	
+	    	case "/download.do": // 학생 성적 엑셀 다운로드
+
+	    		nextPage = "/view_classroom/gradeList.jsp";
+	    		ArrayList<StudentVo> excelStudentList = new ArrayList<StudentVo>();
+	    		String excelStudentId = (String) session.getAttribute("student_id");
+
+	    		if(excelStudentId == null || excelStudentId.trim().equals("")) {
+	    			Cookie failCookie = new Cookie("fileDownloadStatus", "fail");
+	    			failCookie.setPath("/");
+	    			response.addCookie(failCookie);
+	    			response.setContentType("text/html;charset=UTF-8");
+	    			out = response.getWriter();
+	    			out.println("<script>history.back();</script>");
+	    			return;
+	    		}
+
+	    		try {
+	    			excelStudentList = classroomservice.serviceGradeDownload(excelStudentId);
+
+	    			String fileName = URLEncoder.encode("grade", "UTF-8").replaceAll("\\+", "%20");
+	    			response.reset();
+	    			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".xlsx\"");
+
+	    			Cookie successCookie = new Cookie("fileDownloadStatus", "success");
+	    			successCookie.setPath("/");
+	    			response.addCookie(successCookie);
+
+	    			Workbook workbook = new XSSFWorkbook();
+	    			Sheet sheet = workbook.createSheet("grade");
+
+	    			CellStyle headerStyle = workbook.createCellStyle();
+	    			Font headerFont = workbook.createFont();
+	    			headerFont.setBold(true);
+	    			headerStyle.setFont(headerFont);
+	    			headerStyle.setAlignment(HorizontalAlignment.CENTER);
+	    			headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+	    			CellStyle bodyStyle = workbook.createCellStyle();
+	    			bodyStyle.setAlignment(HorizontalAlignment.CENTER);
+	    			bodyStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+    				CellStyle scoreStyle = workbook.createCellStyle();
+    				scoreStyle.cloneStyleFrom(bodyStyle);
+    				DataFormat dataFormat = workbook.createDataFormat();
+    				scoreStyle.setDataFormat(dataFormat.getFormat("0.0"));
+
+	    			String[] title = {"학과","학번","과목","중간","기말","과제","총점","등급"};
+	    			Row header = sheet.createRow(0);
+	    			for(int i=0;i<title.length;i++){
+	    				Cell cell = header.createCell(i);
+	    				cell.setCellValue(title[i]);
+	    				cell.setCellStyle(headerStyle);
+	    			}
+
+	    			int rowNo = 1;
+	    			for(StudentVo s : excelStudentList){
+	    				Row row = sheet.createRow(rowNo++);
+
+	    				String excelMajorName = "";
+	    				String excelCourseName = "";
+	    				try {
+	    					if(s.getCourse() != null){
+	    						if(s.getCourse().getMajorname() != null) excelMajorName = s.getCourse().getMajorname();
+	    						if(s.getCourse().getCourse_name() != null) excelCourseName = s.getCourse().getCourse_name();
+	    					}
+	    				}catch(Exception e){}
+
+	    				float totalScore = 0;
+	    				try {
+	    					if(s.getScore() != null) totalScore = s.getScore();
+	    				}catch(Exception e){}
+	    				
+	    				totalScore = Math.round(totalScore * 10) / 10.0f;
+	    				
+	    				String grade = "F";
+	    				if(totalScore >= 90) grade = "A";
+	    				else if(totalScore >= 80) grade = "B";
+	    				else if(totalScore >= 70) grade = "C";
+	    				else if(totalScore >= 60) grade = "D";
+
+	    				Cell c0 = row.createCell(0); c0.setCellValue(excelMajorName); c0.setCellStyle(bodyStyle);
+	    				Cell c1 = row.createCell(1); c1.setCellValue(s.getStudent_id() != null ? s.getStudent_id() : ""); c1.setCellStyle(bodyStyle);
+	    				Cell c2 = row.createCell(2); c2.setCellValue(excelCourseName); c2.setCellStyle(bodyStyle);
+	    				Cell c3 = row.createCell(3); c3.setCellValue(s.getMidtest_score()); c3.setCellStyle(bodyStyle);
+	    				Cell c4 = row.createCell(4); c4.setCellValue(s.getFinaltest_score()); c4.setCellStyle(bodyStyle);
+	    				Cell c5 = row.createCell(5); c5.setCellValue(s.getAssignment_score()); c5.setCellStyle(bodyStyle);
+	    				Cell c6 = row.createCell(6); c6.setCellValue(totalScore); c6.setCellStyle(scoreStyle);
+	    				Cell c7 = row.createCell(7); c7.setCellValue(grade); c7.setCellStyle(bodyStyle);
+	    			}
+
+	    			for(int i=0;i<title.length;i++){
+	    				sheet.autoSizeColumn(i);
+	    			}
+
+	    			ServletOutputStream sos = response.getOutputStream();
+	    			workbook.write(sos);
+	    			workbook.close();
+	    			sos.flush();
+	    			sos.close();
+	    			return;
+	    		}catch(Exception e){
+	    			e.printStackTrace();
+	    			Cookie failCookie = new Cookie("fileDownloadStatus", "fail");
+	    			failCookie.setPath("/");
+	    			response.addCookie(failCookie);
+	    			response.sendRedirect(request.getContextPath() + "/view_classroom/gradeList.jsp");
+	    			return;
+	    		}
+
+  	    //==========================================================================================
+
 	    	case "/grade_update.do": //교수가 성적 수정
 	    		
 	    		studentList = (ArrayList<StudentVo>) session.getAttribute("studentList");

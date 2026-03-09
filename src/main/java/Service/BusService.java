@@ -14,16 +14,13 @@ import org.json.JSONObject;
 
 public class BusService {
 
-    // 발급받은 서비스 키
-    private static final String SERVICE_KEY =
-            "발급받은_SERVICE_KEY";
+    private static final String SERVICE_KEY = "b48401cf98b243db75c7cef7d1948f3b684ace34b5adddefb9e5bd1c65665482";
 
-    // API 기본 주소
     private static final String API_URL =
             "https://api.odcloud.kr/api/3079310/v1/uddi:4eccd3ef-d4ab-4706-bbb9-dad3edd62833_201905271750";
 
 
-    // 1️⃣ API 호출
+    // API 호출
     private String callAPI() {
 
         StringBuilder result = new StringBuilder();
@@ -45,20 +42,13 @@ public class BusService {
 
             BufferedReader rd;
 
-            if (conn.getResponseCode() >= 200 &&
-                    conn.getResponseCode() <= 300) {
+            if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
 
-                rd =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        conn.getInputStream()));
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
             } else {
 
-                rd =
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        conn.getErrorStream()));
+                rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
             }
 
             String line;
@@ -80,7 +70,7 @@ public class BusService {
     }
 
 
-    // 2️⃣ JSON 파싱 → 버스 노선 리스트
+    // JSON 파싱 → 노선번호 추출
     private List<String> parseRoutes() {
 
         List<String> routes = new ArrayList<>();
@@ -97,8 +87,7 @@ public class BusService {
 
                 JSONObject bus = data.getJSONObject(i);
 
-                String route =
-                        bus.getString("노선번호");
+                String route = bus.getString("노선번호");
 
                 routes.add(route);
             }
@@ -112,7 +101,7 @@ public class BusService {
     }
 
 
-    // 3️⃣ 가상 시간표 생성
+    // 가상 시간표 생성
     private List<String[]> createSchedule(List<String> routes) {
 
         List<String[]> schedule = new ArrayList<>();
@@ -138,7 +127,7 @@ public class BusService {
     }
 
 
-    // 4️⃣ 추천 버스 계산
+    // 추천 버스 계산
     public String[] recommendBus() {
 
         List<String> routes = parseRoutes();
@@ -149,14 +138,12 @@ public class BusService {
 
         for (String[] bus : schedule) {
 
-            LocalTime busTime =
-                    LocalTime.parse(bus[1]);
+            LocalTime busTime = LocalTime.parse(bus[1]);
 
             if (busTime.isAfter(now)) {
 
                 long remain =
-                        Duration.between(now, busTime)
-                                .toMinutes();
+                        Duration.between(now, busTime).toMinutes();
 
                 return new String[]{
                         bus[0],

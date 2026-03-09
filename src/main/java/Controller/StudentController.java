@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //import Dao.CarDAO;
-import Service.EmailService;
 import Service.StudentService;
 import Service.MenuItemService;
 import Vo.MemberVo;
@@ -35,12 +34,10 @@ public class StudentController extends HttpServlet {
 
 	// 부장
 	StudentService studentservice;
-	EmailService emailService;
 
 	@Override
 	public void init() throws ServletException {
 		studentservice = new StudentService();
-		emailService = new EmailService();
 	}
 
 	// doGet doPost 메소드 오버라이딩
@@ -305,43 +302,6 @@ public class StudentController extends HttpServlet {
            out.println("</script>");
            out.close();
            return;
-
-		// ==========================================================================================
-		// 이메일 작성 폼으로 이동
-		case "/email.bo":
-			center = "/view_student/emailForm.jsp";
-			request.setAttribute("center", center);
-			nextPage = "/main.jsp";
-			break;
-
-		// ==========================================================================================
-		// 이메일 전송 처리
-		case "/sendEmail.do":
-			String emailTo      = request.getParameter("emailTo");
-			String emailSubject = request.getParameter("emailSubject");
-			String emailBody    = request.getParameter("emailBody");
-			String emailSender  = (String) session.getAttribute("name");
-
-			if (emailTo == null || emailTo.trim().isEmpty()) {
-				emailTo = "info@yourschool.edu";
-			}
-
-			boolean emailSent = emailService.sendEmail(emailTo, emailSubject, emailBody, emailSender);
-
-			out = response.getWriter();
-			if (emailSent) {
-				out.println("<script>");
-				out.println("alert('이메일이 성공적으로 전송되었습니다.');");
-				out.println("location.href='" + request.getContextPath() + "/student/email.bo';");
-				out.println("</script>");
-			} else {
-				out.println("<script>");
-				out.println("alert('이메일 전송에 실패했습니다. 관리자에게 문의해주세요.');");
-				out.println("history.go(-1);");
-				out.println("</script>");
-			}
-			out.close();
-			return;
 
 		default:
 			break;

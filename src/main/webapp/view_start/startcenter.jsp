@@ -51,7 +51,6 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-
 <!-- 달력관련 -->
 <link
 	href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
@@ -65,6 +64,8 @@
 	rel="stylesheet">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="<%=contextPath%>/js/bus.js"></script>
 
 <link href="<%=contextPath %>/css/startpage.css" rel="stylesheet">
 
@@ -355,7 +356,7 @@
 									<th>날짜</th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="noticeTbody">
 								<% if (list.isEmpty()) { %>
 								<tr>
 									<td colspan="5" class="notice-empty">등록된 글이 없습니다.</td>
@@ -386,7 +387,7 @@
 								<% } } %>
 							</tbody>
 						</table>
-						<div class="pagination">
+						<div class="pagination" id="noticePagination">
 							<% 
                 if (totalRecord != 0) {
                     if (nowBlock > 0) { %>
@@ -408,7 +409,6 @@
 						</div>
 					</div>
 				</div>
-
 
 				<!-- 버스 시간표 -->
 				<div class="bus-card">
@@ -442,11 +442,42 @@
 			</div>
 		</div>
 	</div>
-
-
-
-
 	<script>
+	function fnRead(noticeId){
+        location.href = "<%=contextPath%>/Board/read.bo?notice_id=" + noticeId;
+    }
+
+    $(function () {
+
+        $(document).on("click", "#noticePagination a", function (e) {
+            e.preventDefault();
+
+            var url = $(this).attr("href");
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "html",
+                success: function (response) {
+                    var newTbody = $(response).find("#noticeTbody").html();
+                    var newPagination = $(response).find("#noticePagination").html();
+
+                    if (newTbody && $.trim(newTbody) !== "") {
+                        $("#noticeTbody").html(newTbody);
+                    }
+
+                    if (newPagination && $.trim(newPagination) !== "") {
+                        $("#noticePagination").html(newPagination);
+                    }
+                },
+                error: function () {
+                    alert("공지사항 페이지 이동 중 오류가 발생했습니다.");
+                }
+            });
+        });
+
+    });
+		
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -468,8 +499,6 @@
             calendar.render();
         });
     </script>
-
-	<script src="<%=contextPath%>/js/bus.js"></script>
 
 </body>
 </html>

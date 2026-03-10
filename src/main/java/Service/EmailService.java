@@ -12,9 +12,12 @@ import java.util.Base64;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import Dao.EmailDao;
+
 /**
  * JAR 없이 Java SE 표준 라이브러리만으로 구현한 네이버 SMTP 이메일 전송 서비스.
  * 포트 465 직접 SSL 방식 사용 (STARTTLS 불필요).
+ * EmailDao를 통해 발신자의 실제 이메일을 DB에서 조회하여 Reply-To 헤더에 설정.
  */
 public class EmailService {
 
@@ -24,26 +27,50 @@ public class EmailService {
     private static final String NAVER_ID   = "sjtpals0111@naver.com";
     private static final String NAVER_PW   = "D4DK1YHUJVZM";
 
+    // 수신자 기본값 (미입력 시 사용)
+    private static final String DEFAULT_TO = "info@yourschool.edu";
+
+    // DB에서 사용자 이메일을 조회하는 DAO
+    private EmailDao emailDao;
+
+    public EmailService() {
+        emailDao = new EmailDao();
+    }
+
     /**
      * 이메일을 전송합니다.
+     * - to가 null이거나 비어 있으면 기본 수신자(info@yourschool.edu)로 전송합니다.
+     * - senderUserId를 이용해 DB에서 발신자의 실제 이메일을 조회하여 Reply-To 헤더에 설정합니다.
+     *   (학교 담당자가 답장 시 학생의 이메일로 회신됩니다.)
      *
-     * @param to         수신자 이메일 주소
-     * @param subject    제목
-     * @param body       본문
-     * @param senderName 발신자 이름 (학생 이름)
+     * @param to           수신자 이메일 주소 (null 또는 빈 값이면 기본값 사용)
+     * @param subject      제목
+     * @param body         본문
+     * @param senderName   발신자 이름 (세션의 name 속성)
+     * @param senderUserId 발신자 user_id (세션의 id 속성) — DB 이메일 조회에 사용
      * @return 전송 성공 여부
      */
-    public boolean sendEmail(String to, String subject, String body, String senderName) {
+    public boolean sendEmail(String to, String subject, String body,
+                             String senderName, String senderUserId) {
+
+        // 1. 수신자 기본값 처리 (비즈니스 규칙이므로 Service에서 담당)
+        if (to == null || to.trim().isEmpty()) {
+            to = DEFAULT_TO;
+        }
+
+        // 2. DB에서 발신자의 실제 이메일 조회 (Reply-To 헤더용)
+        String senderEmail = emailDao.getEmailByUserId(senderUserId);
+        log("DB 조회 발신자 이메일: " + senderEmail);
 
         SSLSocket socket = null;
 
         try {
-            // 1. SSL 소켓 직접 연결 (포트 465)
+            // 3. SSL 소켓 직접 연결 (포트 465)
             log("SMTP 연결 시도: " + SMTP_HOST + ":" + SMTP_PORT);
             SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
             socket = (SSLSocket) sf.createSocket(SMTP_HOST, SMTP_PORT);
             socket.setSoTimeout(TIMEOUT_MS);
-            socket.startHandshake();
+            socket.startHandshake(); 
             log("SSL 핸드셰이크 완료: " + socket.getSession().getProtocol());
 
             BufferedReader reader = new BufferedReader(
@@ -51,14 +78,14 @@ public class EmailService {
             PrintWriter writer = new PrintWriter(
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
-            // 2. 서버 인사말 수신
+            // 4. 서버 인사말 수신
             String greeting = readResponse(reader);
             if (!greeting.startsWith("220")) {
                 log("서버 인사말 오류: " + greeting);
                 return false;
             }
 
-            // 3. EHLO
+            // 5. EHLO
             send(writer, "EHLO localhost");
             String ehloResp = readResponse(reader);
             if (!ehloResp.contains("250")) {
@@ -66,7 +93,7 @@ public class EmailService {
                 return false;
             }
 
-            // 4. AUTH LOGIN
+            // 6. AUTH LOGIN
             send(writer, "AUTH LOGIN");
             readResponse(reader); // "334 VXNlcm5hbWU6" (Username:)
             send(writer, base64(NAVER_ID));
@@ -79,7 +106,7 @@ public class EmailService {
             }
             log("인증 성공");
 
-            // 5. 발신자 설정
+            // 7. 발신자 설정
             send(writer, "MAIL FROM:<" + NAVER_ID + ">");
             String mailFromResp = readResponse(reader);
             if (!mailFromResp.startsWith("250")) {
@@ -87,7 +114,7 @@ public class EmailService {
                 return false;
             }
 
-            // 6. 수신자 설정
+            // 8. 수신자 설정
             send(writer, "RCPT TO:<" + to + ">");
             String rcptResp = readResponse(reader);
             if (!rcptResp.startsWith("250")) {
@@ -95,7 +122,7 @@ public class EmailService {
                 return false;
             }
 
-            // 7. 메일 본문 시작
+            // 9. 메일 본문 시작
             send(writer, "DATA");
             String dataStartResp = readResponse(reader);
             if (!dataStartResp.startsWith("354")) {
@@ -103,10 +130,17 @@ public class EmailService {
                 return false;
             }
 
-            // 8. 헤더 + 본문 작성 (RFC 2822)
+            // 10. 헤더 + 본문 작성 (RFC 2822)
             writer.println("From: " + encodeHeader(senderName) + " <" + NAVER_ID + ">");
-            writer.println("To: "      + to);
+            writer.println("To: " + to);
             writer.println("Subject: " + encodeHeader(subject));
+
+            // Reply-To: DB에서 조회한 발신자의 실제 이메일 설정
+            // → 학교 담당자가 답장 시 학생의 이메일로 회신됨
+            if (senderEmail != null && !senderEmail.trim().isEmpty()) {
+                writer.println("Reply-To: " + encodeHeader(senderName) + " <" + senderEmail + ">");
+            }
+
             writer.println("MIME-Version: 1.0");
             writer.println("Content-Type: text/plain; charset=UTF-8");
             writer.println("Content-Transfer-Encoding: base64");
@@ -121,7 +155,7 @@ public class EmailService {
                 return false;
             }
 
-            // 9. 연결 종료
+            // 11. 연결 종료
             send(writer, "QUIT");
             readResponse(reader);
 

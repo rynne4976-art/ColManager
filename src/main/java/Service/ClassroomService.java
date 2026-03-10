@@ -81,6 +81,12 @@ public class ClassroomService {
 		classroomdao.gradeInsert(course_id_, student_id, total,midtest_score, finaltest_score ,assignment_score);
 	}
 
+
+	// 성적 다운로드용 조회
+	public ArrayList<StudentVo> serviceGradeDownload(String student_id) {
+		return classroomdao.gradeDownload(student_id);
+	}
+
 	//성적 조회
 	public ArrayList<StudentVo> serviceGradeSearch(String student_id_1) {
 		return classroomdao.gradeSearch(student_id_1);
@@ -194,11 +200,6 @@ public class ClassroomService {
 	    
 	    return result;
 	}
-
-
-
-
-
 
 
 }

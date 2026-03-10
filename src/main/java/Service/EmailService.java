@@ -70,7 +70,7 @@ public class EmailService {
             SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
             socket = (SSLSocket) sf.createSocket(SMTP_HOST, SMTP_PORT);
             socket.setSoTimeout(TIMEOUT_MS);
-            socket.startHandshake();
+            socket.startHandshake(); 
             log("SSL 핸드셰이크 완료: " + socket.getSession().getProtocol());
 
             BufferedReader reader = new BufferedReader(

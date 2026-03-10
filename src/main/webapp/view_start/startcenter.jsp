@@ -170,6 +170,7 @@
 	font-size: 14px; /* 글꼴 크기 */
 	padding: 20px; /* 내부 여백 */
 }
+
 </style>
 
 
@@ -499,6 +500,9 @@
             calendar.render();
         });
     </script>
+
+	<script src="<%=contextPath%>/js/bus.js"></script>
+
 
 </body>
 </html>

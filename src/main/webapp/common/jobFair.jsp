@@ -12,6 +12,10 @@
 		<div class="jobfair-wrapper">
 		    <h1>취업박람회</h1>
 		    <p class="jobfair-subtitle">기업별 행사 정보, 지도, 채용공고를 한 번에 확인할 수 있습니다.</p>
+		    
+		    <div class="jobfair-search">
+			    <input type="text" id="jobfair-search-input" placeholder="기업명 검색">
+			</div>
 		
 		    <div id="jobfair-list" class="jobfair-list"></div>
 		</div>

@@ -1,0 +1,176 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+    color: #222;
+}
+
+.jobfair-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 90px 20px 40px 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #202124;
+    margin: 0 0 10px 0;
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.jobfair-subtitle {
+    text-align: center;
+    color: #5f6368;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.jobfair-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.jobfair-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 22px 24px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.jobfair-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 4px;
+}
+
+.event-title {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.booth-badge {
+    font-size: 12px;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    background-color: #f7f7f7;
+}
+
+.jobfair-info {
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.jobfair-description {
+    font-size: 14px;
+    color: #3c4043;
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.jobfair-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.jobfair-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #d0d0d0;
+    color: #000;
+    background-color: #fff;
+}
+
+.jobfair-btn:hover {
+    background-color: #f2f2f2;
+}
+
+.posting-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.posting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.posting-item {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.6;
+    padding: 8px 10px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.posting-item a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.posting-item a:hover {
+    text-decoration: underline;
+}
+
+.loading-message,
+.empty-message,
+.error-message {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    padding: 24px 0;
+}
+
+@media (max-width: 700px) {
+    .jobfair-wrapper {
+        padding-top: 100px;
+    }
+
+    .jobfair-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .company-name {
+        font-size: 20px;
+    }
+
+    .event-title {
+        font-size: 15px;
+    }
+
+    .jobfair-btn {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+}

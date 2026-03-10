@@ -64,8 +64,7 @@ public class MenuItemService {
         // 교수 메뉴
         roleMenuMap.put("교수", Arrays.asList(
             new MenuItemVo("강의실", "/classroom/classroom.bo?classroomCenter=professorMyCourse.jsp"),
-            new MenuItemVo("공지 사항", "/Board/list.bo?center=/common/notice/list.jsp"),
-            new MenuItemVo("채팅", "/member/chat.bo")
+            new MenuItemVo("공지 사항", "/Board/list.bo?center=/common/notice/list.jsp")
         ));
         
 	}

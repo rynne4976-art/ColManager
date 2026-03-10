@@ -7,6 +7,6 @@
 
 
 <script>
-	// main.jsp 메인 화면 요청--
+	// main.jsp 메인 화면 요청
 	location.href="<%=contextPath%>/member/main.bo";
 </script>

@@ -1,11 +1,14 @@
 package Controller;
 
 import Service.BusService;
+import com.google.gson.Gson;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.sql.*;
+import java.util.*;
 
 @WebServlet("/bus")
 public class BusController extends HttpServlet {
@@ -15,17 +18,47 @@ public class BusController extends HttpServlet {
 
         BusService service = new BusService();
 
-        // 시간표 가져오기
-        request.setAttribute("schedule", service.getSchedule());
+        List<Map<String,String>> schedule = service.getSchedule();
 
-        // 추천 버스 계산
-        String[] bus = service.recommendBus();
+        List<String> buildings = new ArrayList<>();
 
-        request.setAttribute("busTime", bus[0]);
-        request.setAttribute("busRoute", bus[1]);
-        request.setAttribute("remainTime", bus[2]);
+        try{
 
-        request.getRequestDispatcher("/view_start/startcenter.jsp")
-                .forward(request, response);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection conn =
+            DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/colbus",
+            "root",
+            "0000");
+
+            String sql = "SELECT name FROM building";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                buildings.add(rs.getString("name"));
+            }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        Map<String,Object> result = new HashMap<>();
+
+        result.put("schedule", schedule);
+        result.put("buildings", buildings);
+
+        response.setContentType("application/json;charset=UTF-8");
+
+        String json = new Gson().toJson(result);
+
+        response.getWriter().print(json);
     }
 }

@@ -1,79 +1,374 @@
-body{
+/* ========================= */
+/* 버스 전체 카드 */
+/* ========================= */
 
-font-family:Arial;
-background:linear-gradient(135deg,#7aa7d9,#a6c5e8);
-margin:0;
+.bus-card{
+
+    margin-top:20px;
+
+    background:#f8f9fa;
+
+    border-radius:12px;
+
+    padding:25px;
+
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
 
 }
 
-.container{
 
-width:800px;
-margin:50px auto;
-background:white;
-padding:30px;
+/* ========================= */
+/* 제목 */
+/* ========================= */
+
+.bus-title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    margin-bottom:15px;
+
+}
+
+
+/* ========================= */
+/* 입력 영역 */
+/* ========================= */
+
+.bus-input{
+
+    margin-bottom:15px;
+
+}
+
+.bus-input input{
+
+    padding:6px;
+
+    margin-left:8px;
+
+}
+
+.bus-input button{
+
+    padding:6px 12px;
+
+    margin-left:8px;
+
+    background:#0d6efd;
+
+    border:none;
+
+    color:white;
+
+    border-radius:6px;
+
+}
+
+
+/* ========================= */
+/* 시간표 테이블 */
+/* ========================= */
+
+.bus-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.bus-table th{
+
+    border-bottom:2px solid #dee2e6;
+
+    padding:10px;
+
+    text-align:center;
+
+}
+
+.bus-table td{
+
+    padding:10px;
+
+    text-align:center;
+
+    border-bottom:1px solid #dee2e6;
+
+}
+
+
+/* ========================= */
+/* 스크롤 영역 */
+/* ========================= */
+
+.bus-table-wrap{
+
+    max-height:250px;
+
+    overflow-y:auto;
+
+}
+
+
+/* 스크롤 디자인 */
+
+.bus-table-wrap::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.bus-table-wrap::-webkit-scrollbar-thumb{
+
+    background:#6ea8fe;
+
+    border-radius:10px;
+
+}
+
+
+/* ========================= */
+/* 추천 버스 영역 */
+/* ========================= */
+
+#recommendArea{
+
+    margin-top:25px;
+
+}
+
+
+/* 추천 카드 */
+
+.recommend-card{
+
+    background:#ffffff;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+
+}
+
+
+/* 추천 제목 */
+
+.recommend-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+}
+
+
+/* 버스 번호 */
+
+.recommend-bus{
+
+    display:inline-block;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    background:#0d6efd;
+
+    color:white;
+
+    font-weight:600;
+
+}
+
+
+/* 경로 박스 */
+
+.route-box{
+
+    background:#f1f3f5;
+
+    border-radius:10px;
+
+    padding:15px;
+
+    margin-top:15px;
+
+}
+
+
+/* 시간 */
+
+.route-time{
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+
+/* 소요시간 */
+
+.duration-box{
+
+    background:#e6f4ea;
+
+    padding:10px;
+
+    border-radius:8px;
+
+    margin-top:15px;
+
+    font-weight:600;
+
+}
+
+/* 추천 버스 카드 */
+
+#recommendArea{
+margin-top:20px;
+}
+
+.recommend-card{
+background:#ffffff;
 border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-
+padding:25px;
+margin-top:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+max-width:600px;
 }
 
-h1{
+.recommend-header{
+font-size:22px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.recommend-bus{
+display:inline-block;
+background:#4a7bd4;
+color:white;
+padding:6px 14px;
+border-radius:20px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.route-box{
+background:#f5f7fb;
+border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+text-align:center;
+}
+
+.route-point{
+margin-bottom:8px;
+}
+
+.route-label{
+font-size:13px;
+color:#888;
+}
+
+.route-building{
+font-size:17px;
+font-weight:bold;
+}
+
+.route-time{
+font-size:18px;
+font-weight:bold;
+margin:10px 0;
+color:#4a7bd4;
+}
+
+.duration-box{
+background:#e8f5e9;
+padding:12px;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.arrival-box{
+background:#eef4ff;
+padding:12px;
+border-radius:10px;
+}
+/* 검색 영역 */
+
+.bus-search-box{
 
 margin-bottom:20px;
 
 }
 
-.btn{
+.bus-row{
 
-padding:10px 20px;
-background:#4b82d9;
+display:flex;
+gap:10px;
+margin-bottom:10px;
+
+}
+
+.bus-group{
+
+flex:1;
+display:flex;
+flex-direction:column;
+
+}
+
+.bus-select{
+
+padding:8px;
+border-radius:8px;
+border:1px solid #ddd;
+
+}
+
+.bus-search-btn{
+
+width:100%;
+padding:10px;
+background:#3f7de8;
 border:none;
 color:white;
 border-radius:10px;
-cursor:pointer;
+font-weight:600;
 
 }
 
-table{
+/* 추천 카드 */
 
-width:100%;
-border-collapse:collapse;
+.recommend-card{
+
+background:#ffffff;
+border-radius:20px;
+padding:25px;
 margin-top:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
 
 }
 
-th,td{
-
-padding:10px;
-border-bottom:1px solid #ddd;
-
-}
-
-.recommend{
-
-margin-top:30px;
-padding:20px;
-background:#f0f6ff;
-border-radius:15px;
-
-}
-
-.busTime{
-
-font-size:40px;
-font-weight:bold;
-
-}
-
-.busRoute{
+.recommend-header{
 
 font-size:20px;
+font-weight:700;
+margin-bottom:10px;
 
 }
 
-.remain{
+.no-bus{
 
-color:#2a6edc;
-font-weight:bold;
+padding:20px;
+text-align:center;
 
 }

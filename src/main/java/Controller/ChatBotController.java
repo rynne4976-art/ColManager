@@ -2,6 +2,8 @@ package Controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -25,11 +27,30 @@ public class ChatBotController extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        apiKey = config.getServletContext().getInitParameter("openrouterApiKey");
-        appUrl = config.getServletContext().getInitParameter("appUrl");
-        if (appUrl == null || appUrl.trim().isEmpty()) {
-            appUrl = "http://localhost:8090/ColManager_1";
+
+        try {
+            Properties prop = new Properties();
+            InputStream is = getClass().getClassLoader().getResourceAsStream("config.properties");
+
+            if (is != null) {
+                prop.load(is);
+            }
+
+            apiKey = prop.getProperty("openrouter.apiKey");
+            appUrl = prop.getProperty("app.url");
+
+            if (appUrl == null || appUrl.trim().isEmpty()) {
+                appUrl = "http://localhost:8090/ColManager";
+            }
+
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                throw new ServletException("API키가 설정되지 않았습니다.");
+            }
+
+        } catch (Exception e) {
+            throw new ServletException("config.properties 로딩 실패", e);
         }
+
         chatServer = new ChatServer();
     }
 

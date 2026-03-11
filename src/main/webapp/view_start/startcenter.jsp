@@ -8,37 +8,37 @@
 	pageEncoding="UTF-8"%>
 
 <%
-    request.setCharacterEncoding("UTF-8");
-    String contextPath = request.getContextPath();
-    
-    String id = (String)session.getAttribute("id");
-    String role = (String)session.getAttribute("role");
-    String name = (String)session.getAttribute("name");
-    
-    int totalRecord = 0;
-    int numPerPage = 5;
-    int pagePerBlock = 3;
-    int totalPage = 0;
-    int totalBlock = 0;
-    int nowPage = 0;
-    int nowBlock = 0;
-    int beginPerPage = 0;
+request.setCharacterEncoding("UTF-8");
+String contextPath = request.getContextPath();
 
-    ArrayList<BoardVo> list = (ArrayList<BoardVo>) request.getAttribute("list");
+String id = (String) session.getAttribute("id");
+String role = (String) session.getAttribute("role");
+String name = (String) session.getAttribute("name");
 
-    totalRecord = list.size();
+int totalRecord = 0;
+int numPerPage = 5;
+int pagePerBlock = 3;
+int totalPage = 0;
+int totalBlock = 0;
+int nowPage = 0;
+int nowBlock = 0;
+int beginPerPage = 0;
 
-    if (request.getAttribute("nowPage") != null) {
-        nowPage = Integer.parseInt(request.getAttribute("nowPage").toString());
-    }
+ArrayList<BoardVo> list = (ArrayList<BoardVo>) request.getAttribute("list");
 
-    beginPerPage = nowPage * numPerPage;
-    totalPage = (int) Math.ceil((double) totalRecord / numPerPage);
-    totalBlock = (int) Math.ceil((double) totalPage / pagePerBlock);
+totalRecord = list.size();
 
-    if (request.getAttribute("nowBlock") != null) {
-        nowBlock = Integer.parseInt(request.getAttribute("nowBlock").toString());
-    }
+if (request.getAttribute("nowPage") != null) {
+	nowPage = Integer.parseInt(request.getAttribute("nowPage").toString());
+}
+
+beginPerPage = nowPage * numPerPage;
+totalPage = (int) Math.ceil((double) totalRecord / numPerPage);
+totalBlock = (int) Math.ceil((double) totalPage / pagePerBlock);
+
+if (request.getAttribute("nowBlock") != null) {
+	nowBlock = Integer.parseInt(request.getAttribute("nowBlock").toString());
+}
 %>
 
 <!doctype html>
@@ -67,9 +67,9 @@
 
 <script src="<%=contextPath%>/js/bus.js"></script>
 
-<link href="<%=contextPath %>/css/startpage.css" rel="stylesheet">
+<link href="<%=contextPath%>/css/startpage.css" rel="stylesheet">
 
-<link href="<%=contextPath %>/css/bus.css" rel="stylesheet">
+<link href="<%=contextPath%>/css/bus.css" rel="stylesheet">
 
 <style>
 /* 로그인 박스*/
@@ -170,7 +170,6 @@
 	font-size: 14px; /* 글꼴 크기 */
 	padding: 20px; /* 내부 여백 */
 }
-
 </style>
 
 
@@ -179,20 +178,20 @@
 	<%
 	String message = (String) request.getAttribute("message");
 	if (message != null) {
-    	message = URLDecoder.decode(message, "UTF-8");
+		message = URLDecoder.decode(message, "UTF-8");
 	%>
 	<script>
-	            alert('<%= message %>'); // 메시지를 알림으로 표시
+	            alert('<%=message%>'); // 메시지를 알림으로 표시
 	        </script>
 	<%
-	    }
+	}
 	%>
 	<script>
     let slideIndex = 0;
     const images = [
-        "<%= contextPath %>/img/BackGround/poster1.png",
-        "<%= contextPath %>/img/BackGround/poster2.png",
-        "<%= contextPath %>/img/BackGround/poster3.png"
+        "<%=contextPath%>/img/BackGround/poster1.png",
+        "<%=contextPath%>/img/BackGround/poster2.png",
+        "<%=contextPath%>/img/BackGround/poster3.png"
     ];
     
     let autoSlideTimer; // 자동 슬라이드 타이머
@@ -251,19 +250,19 @@
 						<div class="carousel-inner h-100">
 							<!-- 첫 번째 슬라이드 -->
 							<div class="carousel-item active h-100">
-								<img src="<%= contextPath %>/img/background/poster1.png"
+								<img src="<%=contextPath%>/img/background/poster1.png"
 									class="d-block w-100" alt="Poster 1"
 									style="max-height: 400px; height: auto;">
 							</div>
 							<!-- 두 번째 슬라이드 -->
 							<div class="carousel-item h-100">
-								<img src="<%= contextPath %>/img/background/poster2.png"
+								<img src="<%=contextPath%>/img/background/poster2.png"
 									class="d-block w-100" alt="Poster 2"
 									style="max-height: 400px; height: auto;">
 							</div>
 							<!-- 세 번째 슬라이드 -->
 							<div class="carousel-item h-100">
-								<img src="<%= contextPath %>/img/background/poster3.png"
+								<img src="<%=contextPath%>/img/background/poster3.png"
 									class="d-block w-100" alt="Poster 3"
 									style="max-height: 400px; height: auto;">
 							</div>
@@ -305,7 +304,9 @@
 					<!-- 로그인 박스 -->
 					<div
 						class="h-100 p-5 bg-light border rounded-3 d-flex flex-column justify-content-center">
-						<%  if(id == null) {  %>
+						<%
+						if (id == null) {
+						%>
 						<h2>로그인</h2>
 						<form action="<%=contextPath%>/member/login.do" method="post">
 							<div class="mb-3 d-flex align-items-center">
@@ -320,10 +321,12 @@
 							</div>
 							<button type="submit" class="btn btn-primary w-100">로그인</button>
 						</form>
-						<%  } else {  %>
+						<%
+						} else {
+						%>
 						<h4 class="display-6">
-							<i class="fas fa-book" style="color: #4a90e2"></i> <b><%=name %>
-								<%=role %>님!</b>
+							<i class="fas fa-book" style="color: #4a90e2"></i> <b><%=name%>
+								<%=role%>님!</b>
 						</h4>
 						<!-- 아이콘 변경 -->
 						<p class="lead">
@@ -333,7 +336,9 @@
 
 						<button type="button" class="btn btn-primary"
 							onclick="location.href='<%=contextPath%>/member/logout.me'">로그아웃</button>
-						<%  }  %>
+						<%
+						}
+						%>
 					</div>
 				</div>
 
@@ -358,69 +363,117 @@
 								</tr>
 							</thead>
 							<tbody id="noticeTbody">
-								<% if (list.isEmpty()) { %>
+								<%
+								if (list.isEmpty()) {
+								%>
 								<tr>
 									<td colspan="5" class="notice-empty">등록된 글이 없습니다.</td>
 								</tr>
-								<% } else {
-                        for (int i = beginPerPage; i < (beginPerPage + numPerPage); i++) {
-                            if (i == totalRecord) break;
-                            BoardVo vo = list.get(i);
+								<%
+								} else {
+								for (int i = beginPerPage; i < (beginPerPage + numPerPage); i++) {
+									if (i == totalRecord)
+										break;
+									BoardVo vo = list.get(i);
 
-                           	   // 들여쓰기 계산 (레벨 * 픽셀)
-                               int indent = vo.getB_level() * 20; 
-		                       %>
+									// 들여쓰기 계산 (레벨 * 픽셀)
+									int indent = vo.getB_level() * 20;
+								%>
 								<tr onclick="javascript:fnRead('<%=vo.getNotice_id()%>')">
 									<td><%=vo.getNotice_id()%></td>
 									<td>
 										<div style="margin-left: <%=indent%>px;">
-											<% if (vo.getB_level() > 0) { %>
+											<%
+											if (vo.getB_level() > 0) {
+											%>
 											<!-- 답변글 아이콘 -->
 											<i class="fas fa-reply"
 												style="color: #4a90e2; margin-right: 5px;"></i>
-											<% } %>
+											<%
+											}
+											%>
 											<%=vo.getTitle()%>
 										</div>
 									</td>
 									<td><%=vo.getUserName().getUser_name()%></td>
 									<td><%=vo.getCreated_date()%></td>
 								</tr>
-								<% } } %>
+								<%
+								}
+								}
+								%>
 							</tbody>
 						</table>
 						<div class="pagination" id="noticePagination">
-							<% 
-                if (totalRecord != 0) {
-                    if (nowBlock > 0) { %>
+							<%
+							if (totalRecord != 0) {
+								if (nowBlock > 0) {
+							%>
 							<a
 								href="<%=contextPath%>/Board/list.bo?center=/view_start/startcenter.jsp&nowBlock=<%=nowBlock - 1%>&nowPage=<%=((nowBlock - 1) * pagePerBlock)%>">◀
 								이전</a>
-							<% }
-                    for (int i = 0; i < pagePerBlock; i++) {
-                        int pageNum = (nowBlock * pagePerBlock) + i + 1;
-                        if (pageNum > totalPage) break; %>
+							<%
+							}
+							for (int i = 0; i < pagePerBlock; i++) {
+							int pageNum = (nowBlock * pagePerBlock) + i + 1;
+							if (pageNum > totalPage)
+								break;
+							%>
 							<a
 								href="<%=contextPath%>/Board/list.bo?center=/view_start/startcenter.jsp&nowBlock=<%=nowBlock%>&nowPage=<%=pageNum - 1%>"><%=pageNum%></a>
-							<% }
-                    if (totalBlock > nowBlock + 1) { %>
+							<%
+							}
+							if (totalBlock > nowBlock + 1) {
+							%>
 							<a
 								href="<%=contextPath%>/Board/list.bo?center=/view_start/startcenter.jsp&nowBlock=<%=nowBlock + 1%>&nowPage=<%=(nowBlock + 1) * pagePerBlock%>">▶
 								다음</a>
-							<% } } %>
+							<%
+							}
+							}
+							%>
 						</div>
 					</div>
 				</div>
 
-				<!-- 버스 시간표 -->
 				<div class="bus-card">
 
-					<h3 class="bus-title">🚌 버스 시간표</h3>
+					<h3 class="bus-title">🚌 학내 버스 검색</h3>
 
-					<div class="bus-input">
-						수업 종료시간 <input type="time" id="classEndTime">
-						<button onclick="recommendBus()">버스 추천</button>
+					<div class="bus-search-box">
+
+						<div class="bus-row">
+
+							<div class="bus-group">
+								<label>출발 건물</label> <select id="startBuilding"
+									class="bus-select">
+									<option value="">선택하세요</option>
+								</select>
+							</div>
+
+							<div class="bus-group">
+								<label>도착 건물</label> <select id="endBuilding" class="bus-select">
+									<option value="">선택하세요</option>
+								</select>
+							</div>
+
+						</div>
+
+						<div class="bus-row">
+
+							<div class="bus-group">
+								<label>수업 종료시간</label> <input type="time" id="classEndTime">
+							</div>
+
+						</div>
+
+						<button class="bus-search-btn" onclick="recommendBus()">
+							🔍 버스 찾기</button>
+
 					</div>
 
+
+					<!-- 시간표 -->
 					<div class="bus-table-wrap">
 						<table class="bus-table">
 							<thead>
@@ -433,9 +486,11 @@
 							</thead>
 
 							<tbody id="busTableBody"></tbody>
+
 						</table>
 					</div>
 
+					<!-- 추천 영역 -->
 					<div id="recommendArea"></div>
 
 				</div>
@@ -501,7 +556,9 @@
         });
     </script>
 
-	<script src="<%=contextPath%>/js/bus.js"></script>
+	<script>
+		const contextPath = "<%=contextPath%>";
+	</script>
 
 
 </body>

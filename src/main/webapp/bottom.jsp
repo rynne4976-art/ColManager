@@ -74,7 +74,7 @@
 <div class="site-footer-wrap">
 	<div class="container">
 		<div class="row">
-			<!-- 저작권 및 학교 이름 -->
+			<!-- 저작권 및 학교 이름 ----- -->
 			<div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
 				<h5>학사 관리 프로그램</h5>
 				<p class="mb-0">© 2024 Your School Name. All rights reserved.</p>

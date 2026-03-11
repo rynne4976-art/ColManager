@@ -103,11 +103,12 @@
 				</div>
 
 				<div class="mb-3">
-					<label for="emailTo" class="form-label fw-semibold">
+					<label class="form-label fw-semibold">
 						<i class="fas fa-at me-1 text-secondary"></i>받는 사람
 					</label>
-					<input type="email" class="form-control" id="emailTo"
-					       placeholder="수신자 이메일 주소">
+					<div class="form-control bg-light text-muted" style="cursor:default;">
+						<i class="fas fa-user-shield me-1"></i>관리자
+					</div>
 				</div>
 
 				<div class="mb-3">
@@ -240,17 +241,12 @@ function submitEmail() {
     var emailModal = document.getElementById('emailModal');
     if (!emailModal) return;
 
-    var to      = document.getElementById('emailTo').value.trim();
     var subject = document.getElementById('emailSubject').value.trim();
     var body    = document.getElementById('emailBody').value.trim();
     var result  = document.getElementById('emailResult');
 
     result.innerHTML = '';
 
-    if (!to) {
-        showEmailResult('danger', '수신자 이메일 주소를 입력해주세요.');
-        return;
-    }
     if (!subject) {
         showEmailResult('danger', '제목을 입력해주세요.');
         return;
@@ -265,7 +261,6 @@ function submitEmail() {
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>전송 중...';
 
     var formData = new FormData();
-    formData.append('emailTo', to);
     formData.append('emailSubject', subject);
     formData.append('emailBody', body);
 

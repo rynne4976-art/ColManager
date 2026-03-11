@@ -124,8 +124,8 @@ h1 {
 .posting-item {
     font-size: 13px;
     color: #444;
-    line-height: 1.6;
-    padding: 8px 10px;
+    line-height: 1.5;
+    padding: 8px 10px 7px 10px;
     background-color: #fafafa;
     border-radius: 8px;
     border: 1px solid #eee;
@@ -173,4 +173,109 @@ h1 {
         text-align: center;
         box-sizing: border-box;
     }
+}
+
+.jobfair-search {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 30px 0;
+}
+
+.jobfair-search input {
+    width: 320px;
+    max-width: 90%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.jobfair-search input:focus {
+    border-color: #4285f4;
+}
+
+.jobfair-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #d0d0d0;
+    color: #000;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+button.jobfair-btn {
+    font-family: inherit;
+}
+
+.posting-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.posting-meta {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+}
+
+.deadline-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    border: 1px solid #ddd;
+    background-color: #f7f7f7;
+    color: #333;
+    margin-top: 0;
+    transform: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.deadline-badge.soon {
+    background-color: #fff8e1;
+    border-color: #f0d98a;
+}
+
+.deadline-badge.urgent {
+    background-color: #ffe9e9;
+    border-color: #f0b4b4;
+}
+
+.deadline-badge.closed {
+    background-color: #f1f1f1;
+    border-color: #d5d5d5;
+    color: #777;
+}
+
+.posting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.posting-header a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #000;
+}
+
+.posting-header a:hover {
+    text-decoration: underline;
 }

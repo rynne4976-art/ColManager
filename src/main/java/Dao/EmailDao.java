@@ -39,6 +39,33 @@ public class EmailDao {
 	}
 
 	// =====================================================================
+	// 관리자 이메일 주소 조회
+	// → role = '관리자' 인 첫 번째 사용자의 email을 반환
+	public String getAdminEmail() {
+
+		String email = null;
+		String query = "SELECT email FROM user WHERE role = '관리자' LIMIT 1";
+
+		try {
+			con   = ds.getConnection();
+			pstmt = con.prepareStatement(query);
+			rs    = pstmt.executeQuery();
+
+			if (rs.next()) {
+				email = rs.getString("email");
+			}
+
+		} catch (SQLException e) {
+			System.err.println("EmailDao.getAdminEmail() 오류: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+
+		return email; // 조회 실패 시 null 반환
+	}
+
+	// =====================================================================
 	// user_id로 해당 사용자의 이메일 주소 조회
 	// → user 테이블의 email 컬럼 값을 반환
 	public String getEmailByUserId(String userId) {

@@ -182,36 +182,6 @@
 	        display: block;
 	    }
 
-/* ── 언어 선택 버튼 ── */
-.lang-switcher {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.lang-btn {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: #fff;
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-    white-space: nowrap;
-}
-
-.lang-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.8);
-}
-
-.lang-btn.active {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: #fff;
-    font-weight: 700;
-}
-
 /* ── Google Translate 기본 배너 숨기기 ── */
 .goog-te-banner-frame.skiptranslate { display: none !important; }
 body                                { top: 0px !important; }

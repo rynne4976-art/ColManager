@@ -57,7 +57,8 @@ public class EmailController extends HttpServlet {
 		case "/sendEmail.do":
 
 			// HTTP 요청 파라미터 추출 (Controller 역할)
-			String emailTo      = request.getParameter("emailTo");
+			// emailTo는 null로 설정 → EmailService의 DEFAULT_TO(info@yourschool.edu)로 자동 고정
+			String emailTo      = null;
 			String emailSubject = request.getParameter("emailSubject");
 			String emailBody    = request.getParameter("emailBody");
 

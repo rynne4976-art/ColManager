@@ -29,7 +29,7 @@
         background-color: #f0f2f5;
     }
 
-    .chat-wrapper {
+.chat-wrapper {
         max-width: 800px;
         margin: 30px auto;
         display: flex;
@@ -37,31 +37,7 @@
         height: calc(100vh - 120px);
     }
 
-    /* 상단 헤더 */
-    .chat-header {
-        background-color: #343a40;
-        color: #fff;
-        padding: 14px 20px;
-        border-radius: 12px 12px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .chat-header .title {
-        font-size: 1.1rem;
-        font-weight: 700;
-    }
-
-    .chat-header .meta {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        font-size: 0.85rem;
-        color: #ced4da;
-    }
-
-    /* 접속 상태 표시 */
+/* 접속 상태 표시 */
     .status-dot {
         width: 10px;
         height: 10px;
@@ -193,25 +169,7 @@
 
 <div class="chat-wrapper">
 
-    <!-- 헤더 -->
-    <div class="chat-header">
-        <span class="title">
-            <i class="fas fa-comments me-2"></i>실시간 채팅
-        </span>
-        <div class="meta">
-            <span>
-                <span class="status-dot" id="statusDot"></span>
-                <span id="statusText">연결 중...</span>
-            </span>
-            <span>
-                <i class="fas fa-users me-1"></i>
-                <span id="userCount">0</span>명 접속 중
-            </span>
-            <span><%= myName %> (<%= myRole %>)</span>
-        </div>
-    </div>
-
-    <!-- 메시지 목록 -->
+<!-- 메시지 목록 -->
     <div class="chat-messages" id="chatMessages"></div>
 
     <!-- 입력창 -->
@@ -249,7 +207,8 @@
         ws.onmessage = function (event) {
             var data = JSON.parse(event.data);
             renderMessage(data);
-            document.getElementById('userCount').textContent = data.userCount;
+            var uc = document.getElementById('userCount');
+            if (uc) uc.textContent = data.userCount;
         };
 
         ws.onclose = function () {
@@ -322,17 +281,9 @@
         scrollToBottom();
     }
 
-    // ── 접속 상태 업데이트 ───────────────────────────
+    // ── 접속 상태 업데이트 (헤더 제거로 DOM 없음 → 콘솔 로그로 대체) ──
     function setStatus(connected) {
-        var dot  = document.getElementById('statusDot');
-        var text = document.getElementById('statusText');
-        if (connected) {
-            dot.className  = 'status-dot connected';
-            text.textContent = '연결됨';
-        } else {
-            dot.className  = 'status-dot disconnected';
-            text.textContent = '연결 끊김';
-        }
+        console.log('[Chat] 연결 상태:', connected ? '연결됨' : '연결 끊김');
     }
 
     // ── 스크롤 하단 이동 ─────────────────────────────

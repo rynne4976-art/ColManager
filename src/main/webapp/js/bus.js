@@ -76,6 +76,8 @@ function initBuildings(buildings) {
 
 function toMin(t) {
 
+	if(!t) return 0
+
 	let [h, m] = t.split(":").map(Number)
 
 	return h * 60 + m
@@ -91,28 +93,22 @@ function recommendBus() {
 	let endTime = document.getElementById("classEndTime").value
 
 	if (!start || !end || !endTime) {
-
 		alert("모든 값을 입력하세요.")
 		return
-
 	}
 
 	if (start === end) {
-
 		alert("출발과 도착 건물이 같습니다.")
 		return
-
 	}
 
-	/* 종료시간 +10분 */
-
-	let target = toMin(endTime) + 10
+	let target = toMin(endTime) + 5
 
 	let best = null
 
 	for (let bus of busList) {
 
-		if (bus.start === start && bus.end === end) {
+		if (bus.start === start) {
 
 			if (toMin(bus.time) >= target) {
 
@@ -128,7 +124,6 @@ function recommendBus() {
 	renderRecommend(best)
 
 }
-
 
 /* 추천 카드 */
 

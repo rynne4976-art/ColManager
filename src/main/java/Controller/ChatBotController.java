@@ -1,8 +1,8 @@
 package Controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
@@ -12,17 +12,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONObject;
 
-import webSocket.ChatServer;
+import Service.ChatbotService;
 
 @WebServlet("/chatbot/*")
 public class ChatBotController extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private String apiKey;
     private String appUrl;
-    private ChatServer chatServer;
+    private ChatbotService chatbotService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -43,15 +46,11 @@ public class ChatBotController extends HttpServlet {
                 appUrl = "http://localhost:8090/ColManager";
             }
 
-            if (apiKey == null || apiKey.trim().isEmpty()) {
-                throw new ServletException("API키가 설정되지 않았습니다.");
-            }
+            chatbotService = new ChatbotService(apiKey, appUrl);
 
         } catch (Exception e) {
             throw new ServletException("config.properties 로딩 실패", e);
         }
-
-        chatServer = new ChatServer();
     }
 
     @Override
@@ -86,14 +85,23 @@ public class ChatBotController extends HttpServlet {
 
             try {
                 String message = request.getParameter("message");
-                if (message == null || message.trim().isEmpty()) {
-                    json.put("status", "fail");
-                    json.put("reply", "질문을 입력해주세요.");
-                } else {
-                    String reply = chatServer.ask(apiKey, appUrl, message);
-                    json.put("status", "success");
-                    json.put("reply", reply);
+
+                HttpSession session = request.getSession(false);
+                String loginId = null;
+                String role = null;
+                String studentId = null;
+
+                if (session != null) {
+                    loginId = (String) session.getAttribute("id");
+                    role = (String) session.getAttribute("role");
+                    studentId = (String) session.getAttribute("student_id");
                 }
+
+                String reply = chatbotService.getReply(message, loginId, role, studentId);
+
+                json.put("status", "success");
+                json.put("reply", reply);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 json.put("status", "fail");

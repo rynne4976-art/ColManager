@@ -195,18 +195,30 @@
         <thead>
             <tr>
                 <th>NO</th><th>과목번호</th><th>과목명</th>
-                <th>중간</th><th>기말</th><th>과제</th><th>총점</th><th>등급</th>
+                <th>중간</th><th>기말</th><th>과제</th><th>총점</th><th>등급</th><th>학점</th>
             </tr>
         </thead>
         <tbody>
         <%
-            int rowNo = 1; float totalSum = 0;
+            int rowNo = 1; float totalSum = 0; float gpaSum = 0;
             if (gradeList != null && !gradeList.isEmpty()) {
                 for (StudentVo s : gradeList) {
                     float score = s.getScore() != null ? s.getScore() : 0f;
                     score = Math.round(score * 10) / 10.0f;
                     totalSum += score;
-                    String g = score>=90?"A": score>=80?"B": score>=70?"C": score>=60?"D":"F";
+                    /* 4.5 만점 등급 계산 */
+                    String g; float gpa;
+                    if      (score >= 95) { g = "A+"; gpa = 4.5f; }
+                    else if (score >= 90) { g = "A0"; gpa = 4.0f; }
+                    else if (score >= 85) { g = "B+"; gpa = 3.5f; }
+                    else if (score >= 80) { g = "B0"; gpa = 3.0f; }
+                    else if (score >= 75) { g = "C+"; gpa = 2.5f; }
+                    else if (score >= 70) { g = "C0"; gpa = 2.0f; }
+                    else if (score >= 65) { g = "D+"; gpa = 1.5f; }
+                    else if (score >= 60) { g = "D0"; gpa = 1.0f; }
+                    else                  { g = "F";  gpa = 0.0f; }
+                    gpaSum += gpa;
+                    String gClass = g.substring(0, 1); // A/B/C/D/F → CSS 클래스 첫 글자
                     String cn = s.getCourse()!=null ? s.getCourse().getCourse_name() : "-";
                     String ci = s.getCourse()!=null ? s.getCourse().getCourse_id()   : "-";
         %>
@@ -218,19 +230,22 @@
                 <td><%= s.getFinaltest_score() %></td>
                 <td><%= s.getAssignment_score() %></td>
                 <td><%= String.format("%.1f", score) %></td>
-                <td class="g-<%= g %>"><%= g %></td>
+                <td class="g-<%= gClass %>"><%= g %></td>
+                <td class="g-<%= gClass %>"><%= String.format("%.1f", gpa) %></td>
             </tr>
         <%  } } else { %>
-            <tr><td colspan="8" style="color:#868e96;">성적 데이터가 없습니다.</td></tr>
+            <tr><td colspan="9" style="color:#868e96;">성적 데이터가 없습니다.</td></tr>
         <% } %>
         </tbody>
         <% if (gradeList != null && !gradeList.isEmpty()) {
-               float avg = totalSum / gradeList.size(); %>
+               float avg    = totalSum / gradeList.size();
+               float avgGpa = gpaSum   / gradeList.size(); %>
         <tfoot>
             <tr>
-                <td colspan="6" style="text-align:right;">평균 총점</td>
+                <td colspan="6" style="text-align:right;">평균 총점 / 평균 학점</td>
                 <td><%= String.format("%.1f", avg) %></td>
                 <td>-</td>
+                <td style="color:#0d6efd;font-weight:700;"><%= String.format("%.2f", avgGpa) %> / 4.5</td>
             </tr>
         </tfoot>
         <% } %>

@@ -5,17 +5,16 @@
 	String contextPath = request.getContextPath();
 	String sessionRole = (String) session.getAttribute("role");
 	String sessionName = (String) session.getAttribute("name");
-	String sessionId = (String) session.getAttribute("id");   // 로그인 여부 판단용
-	
+	String sessionId = (String) session.getAttribute("id");
+	boolean isLogin = (sessionId != null && !sessionId.trim().isEmpty());
 %>
 
 <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 
-<!-- AI + 채팅 + 이메일 버튼 묶음 -->
 <div class="floating-widget-stack">
 
 	<!-- 이메일 버튼: 로그인한 사용자만 노출 -->
-	<% if (sessionRole!=null) { %>
+	<% if (isLogin) { %>
 	<button class="btn-float-email"
 	        data-bs-toggle="modal"
 	        data-bs-target="#emailModal"
@@ -25,7 +24,7 @@
 	<% } %>
 
 	<!-- 실시간 채팅 버튼: 로그인한 사용자만 노출 -->
-	<% if (sessionRole!=null) { %>
+	<% if (isLogin) { %>
 	<button type="button" class="btn-float-chat" id="openChatFloatBtn" title="실시간 채팅">
 		<i class="fas fa-comments"></i>
 	</button>
@@ -38,7 +37,7 @@
 </div>
 
 <!-- 실시간 채팅 패널: 로그인한 사용자만 렌더링 -->
-<% if (sessionRole!=null) { %>
+<% if (isLogin) { %>
 <div class="chat-float-panel" id="chatFloatPanel">
 	<div class="chat-float-header">
 		<span><i class="fas fa-comments me-2"></i>실시간 채팅</span>
@@ -81,7 +80,7 @@
 </div>
 
 <!-- 이메일 모달: 로그인한 사용자만 렌더링 -->
-<% if (sessionRole!=null) { %>
+<% if (isLogin) { %>
 <div class="modal fade" id="emailModal" tabindex="-1"
      aria-labelledby="emailModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-centered">

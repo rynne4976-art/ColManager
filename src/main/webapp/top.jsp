@@ -62,15 +62,6 @@
 			<!-- 언어 선택 + 환영 메시지 + 로그아웃 -->
 			<div class="d-flex align-items-center ms-auto gap-3">
 
-				<!-- 언어 선택 버튼 -->
-				<div class="lang-switcher">
-					<button class="lang-btn" data-lang="ko" onclick="changeLanguage('ko')">KO</button>
-					<button class="lang-btn" data-lang="en" onclick="changeLanguage('en')">EN</button>
-					<button class="lang-btn" data-lang="zh-CN" onclick="changeLanguage('zh-CN')">中文</button>
-					<button class="lang-btn" data-lang="ja" onclick="changeLanguage('ja')">日本語</button>
-					<button class="lang-btn" data-lang="es" onclick="changeLanguage('es')">ES</button>
-				</div>
-
 				<!-- 환영 메시지와 로그아웃 버튼: 로그인된 경우에만 표시 -->
 				<div class="navbar-text">
 					<%

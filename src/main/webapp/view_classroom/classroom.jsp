@@ -194,6 +194,12 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
                                 강의 평가
                             </a>
+
+                            <!-- 증명서 조회 -->
+                            <a class="nav-link" href="<%=contextPath%>/classroom/certificate.bo">
+                                <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                                증명서 조회
+                            </a>
                     <%	} %> 
                         </div>
                     </div>

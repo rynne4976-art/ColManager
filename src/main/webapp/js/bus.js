@@ -6,18 +6,17 @@ window.addEventListener("DOMContentLoaded", function() {
 		.then(res => res.json())
 		.then(data => {
 
-		    busList = data.schedule
+			busList = data.schedule
 
-		    renderTable(busList)
+			renderTable(busList)
 
-		    initBuildings(data.buildings)
+			initBuildings(data.buildings)
 
 		})
 
 })
 
 /* 시간표 출력 */
-
 function renderTable(data) {
 
 	let tbody = document.getElementById("busTableBody")
@@ -36,19 +35,14 @@ function renderTable(data) {
          <td>${b1.route}</td>`
 
 		if (b2) {
-
 			html +=
 				`<td>${b2.time}</td>
              <td>${b2.route}</td>`
-
 		} else {
-
 			html += "<td></td><td></td>"
-
 		}
 
 		row.innerHTML = html
-
 		tbody.appendChild(row)
 
 	}
@@ -56,36 +50,27 @@ function renderTable(data) {
 }
 
 /* 건물 목록 생성 */
-
 function initBuildings(buildings) {
 
 	let startSel = document.getElementById("startBuilding")
 	let endSel = document.getElementById("endBuilding")
 
 	buildings.forEach(b => {
-
 		startSel.innerHTML += `<option value="${b}">${b}</option>`
 		endSel.innerHTML += `<option value="${b}">${b}</option>`
-
 	})
 
 }
 
-
 /* 시간 → 분 */
-
 function toMin(t) {
-
-	if(!t) return 0
+	if (!t) return 0
 
 	let [h, m] = t.split(":").map(Number)
-
 	return h * 60 + m
-
 }
 
 /* 추천 버스 */
-
 function recommendBus() {
 
 	let start = document.getElementById("startBuilding").value
@@ -102,23 +87,18 @@ function recommendBus() {
 		return
 	}
 
-	let target = toMin(endTime) + 5
+	/* 종료시간 +10분 */
+	let target = toMin(endTime) + 10
 
 	let best = null
 
 	for (let bus of busList) {
-
-		if (bus.start === start) {
-
+		if (bus.start === start && bus.end === end) {
 			if (toMin(bus.time) >= target) {
-
 				best = bus
 				break
-
 			}
-
 		}
-
 	}
 
 	renderRecommend(best)
@@ -126,16 +106,13 @@ function recommendBus() {
 }
 
 /* 추천 카드 */
-
 function renderRecommend(bus) {
 
 	let area = document.getElementById("recommendArea")
 
 	if (!bus) {
-
 		area.innerHTML = "<div class='no-bus'>이용 가능한 버스가 없습니다.</div>"
 		return
-
 	}
 
 	let depart = bus.time
@@ -144,9 +121,7 @@ function renderRecommend(bus) {
 	let duration = toMin(arrive) - toMin(depart)
 
 	area.innerHTML = `
-
     <div class="recommend-card">
-
         <div class="recommend-header">
             🚌 추천 버스
         </div>
@@ -156,7 +131,6 @@ function renderRecommend(bus) {
         </div>
 
         <div class="route-box">
-
             <div class="route-point">
                 <div class="route-label">출발</div>
                 <div class="route-building">${bus.start}</div>
@@ -170,7 +144,6 @@ function renderRecommend(bus) {
                 <div class="route-label">도착</div>
                 <div class="route-building">${bus.end}</div>
             </div>
-
         </div>
 
         <div class="duration-box">
@@ -180,9 +153,6 @@ function renderRecommend(bus) {
         <div class="arrival-box">
             도착 예상 : ${arrive}
         </div>
-
     </div>
-
     `
-
 }

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c//**)",
+      "Bash(find /c/workspace_team/.metadata -name tmp* -type d)",
+      "Bash(find /c/workspace_team/ColManager/src/main/webapp/images -name *.*)",
+      "Bash(grep -c \".\" find /c/workspace_team/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/ColManager_m/images -name \"*\")",
+      "Bash(xargs grep:*)",
+      "Bash(ls /c/workspace_team/ColManager/src/main/java/Controller/Chat*)",
+      "Bash(find /c/workspace_team/ColManager/src/main/webapp/css -name bottom*)",
+      "Bash(grep -rn \"bottom.css\\\\|bottom\\\\.jsp\" /c/workspace_team/ColManager/src/main/webapp/ --include=*.jsp --include=*.css)"
+    ]
+  }
+}

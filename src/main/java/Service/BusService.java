@@ -6,7 +6,6 @@ import java.util.*;
 public class BusService {
 
     private Connection getConnection() throws Exception {
-
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         return DriverManager.getConnection(
@@ -17,41 +16,36 @@ public class BusService {
     }
 
     /* 버스 시간표 */
+    public List<Map<String, String>> getSchedule() {
 
-    public List<Map<String,String>> getSchedule(){
+        List<Map<String, String>> list = new ArrayList<>();
 
-        List<Map<String,String>> list = new ArrayList<>();
-
-        try{
-
+        try {
             Connection conn = getConnection();
 
-            String sql = "SELECT start_building,end_building,bus_number,travel_time FROM route ORDER BY travel_time";
+            String sql = "SELECT start_building, end_building, bus_number, travel_time FROM route ORDER BY travel_time";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
 
-                String time = rs.getString("travel_time").substring(0,5);
+                String time = rs.getString("travel_time").substring(0, 5);
 
                 String[] t = time.split(":");
-
                 int h = Integer.parseInt(t[0]);
                 int m = Integer.parseInt(t[1]);
 
                 // 이동시간 10분 추가
                 m += 10;
-                if(m >= 60){
+                if (m >= 60) {
                     h++;
                     m -= 60;
                 }
 
-                String arrive = String.format("%02d:%02d",h,m);
+                String arrive = String.format("%02d:%02d", h, m);
 
-                Map<String,String> map = new HashMap<>();
-
+                Map<String, String> map = new HashMap<>();
                 map.put("route", rs.getString("bus_number"));
                 map.put("time", time);
                 map.put("start", rs.getString("start_building"));
@@ -61,9 +55,11 @@ public class BusService {
                 list.add(map);
             }
 
+            rs.close();
+            ps.close();
             conn.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -71,22 +67,19 @@ public class BusService {
     }
 
     /* 건물 목록 */
-
-    public List<String> getBuildings(){
+    public List<String> getBuildings() {
 
         List<String> list = new ArrayList<>();
 
-        try{
-
+        try {
             Connection conn = getConnection();
 
             String sql = "SELECT name FROM building";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 list.add(rs.getString("name"));
             }
 
@@ -94,7 +87,7 @@ public class BusService {
             ps.close();
             conn.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

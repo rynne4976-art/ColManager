@@ -28,11 +28,16 @@ public class ChatServer {
     }
 
     public String ask(String apiKey, String appUrl, String userMessage) throws Exception {
+        return ask(apiKey, appUrl, buildSystemPrompt(), userMessage);
+    }
+
+    public String ask(String apiKey, String appUrl, String systemPrompt, String userMessage) throws Exception {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            return "AI API 키가 설정되지 않았습니다. web.xml의 openrouterApiKey를 확인해주세요.";
+            return "AI API 키가 설정되지 않았습니다. config.properties를 확인해주세요.";
         }
 
         HttpURLConnection conn = null;
+
         try {
             URL url = new URL(API_URL);
             conn = (HttpURLConnection) url.openConnection();
@@ -50,7 +55,10 @@ public class ChatServer {
 
             JSONObject systemMsg = new JSONObject();
             systemMsg.put("role", "system");
-            systemMsg.put("content", buildSystemPrompt());
+            systemMsg.put("content",
+                    systemPrompt == null || systemPrompt.trim().isEmpty()
+                            ? buildSystemPrompt()
+                            : systemPrompt);
             messages.add(systemMsg);
 
             JSONObject userMsg = new JSONObject();
@@ -75,25 +83,31 @@ public class ChatServer {
             JSONParser parser = new JSONParser();
             JSONObject root = (JSONObject) parser.parse(responseText);
             JSONArray choices = (JSONArray) root.get("choices");
+
             if (choices == null || choices.isEmpty()) {
                 return "AI 응답을 받지 못했습니다.";
             }
 
             JSONObject first = (JSONObject) choices.get(0);
             JSONObject message = (JSONObject) first.get("message");
+
             if (message == null) {
                 return "AI 응답 형식이 올바르지 않습니다.";
             }
 
             Object content = message.get("content");
             return content == null ? "AI 응답이 비어 있습니다." : String.valueOf(content).trim();
+
         } finally {
-            if (conn != null) conn.disconnect();
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }
 
     private String readAll(InputStream is) throws IOException {
         if (is == null) return "";
+
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;

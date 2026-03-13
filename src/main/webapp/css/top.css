@@ -181,3 +181,9 @@
 	    .list-group > li:hover > ul {
 	        display: block;
 	    }
+
+/* ── Google Translate 기본 배너 숨기기 ── */
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body                                { top: 0px !important; }
+.goog-logo-link                     { display: none !important; }
+.goog-te-gadget                     { font-size: 0px; }

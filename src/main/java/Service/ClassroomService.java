@@ -185,6 +185,11 @@ public class ClassroomService {
 	    return classroomdao.insertEnrollmentPeriod(startTimestamp, endTimestamp, description); // DAO 호출
 	}
 
+	// 증명서용: 학번으로 학생 개인 정보(전공·학년·재학상태·입학일) 조회
+	public StudentVo serviceGetStudentInfo(String studentId) {
+		return classroomdao.getStudentInfo(studentId);
+	}
+
 	//----------
 	// 학생 강의실 홈에서 학생이 수강하는 모든 강의의 과제와 공지사항을 조회하기 위해 DAO 호출
 	public Map<String, List> getAssignmentsAndNotices(String studentId) {

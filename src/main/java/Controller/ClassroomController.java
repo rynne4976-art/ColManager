@@ -862,13 +862,52 @@ public class ClassroomController extends HttpServlet {
 	            
 	    		break;
 	    	    
-	    //==========================================================================================	  
+	    //==========================================================================================
+	    	// ── 증명서 조회 메인 페이지 ──────────────────────────────────────────────────────
+	    	case "/certificate.bo":
+	    	{
+	    		String certStudentId = (String) session.getAttribute("student_id");
+	    		if (certStudentId != null) {
+	    			ArrayList<StudentVo> certGradeList = classroomservice.serviceGradeSearch(certStudentId);
+	    			StudentVo certStudentInfo = classroomservice.serviceGetStudentInfo(certStudentId);
+	    			session.setAttribute("studentList", certGradeList);
+	    			request.setAttribute("studentInfo", certStudentInfo);
+	    		}
+	    		request.setAttribute("classroomCenter", "/view_classroom/certificate/certificateMain.jsp");
+	    		nextPage = "/view_classroom/classroom.jsp";
+	    		break;
+	    	}
+
+	    	// ── 증명서 인쇄 미리보기 (새 탭) — grade | graduation ──────────────────────────
+	    	case "/certPrint.bo":
+	    	{
+	    		String cpStudentId = (String) session.getAttribute("student_id");
+	    		String cpType      = request.getParameter("type"); // "grade" | "graduation"
+	    		if (cpStudentId != null) {
+	    			StudentVo cpInfo = classroomservice.serviceGetStudentInfo(cpStudentId);
+	    			request.setAttribute("studentInfo", cpInfo);
+	    			if ("grade".equals(cpType)) {
+	    				ArrayList<StudentVo> cpGradeList = classroomservice.serviceGradeSearch(cpStudentId);
+	    				request.setAttribute("gradeList", cpGradeList);
+	    			}
+	    		}
+	    		request.setAttribute("certType", cpType);
+	    		nextPage = "/view_classroom/certificate/certificatePrint.jsp";
+	    		break;
+	    	}
+
+	    //==========================================================================================
 
 	    	default:
 	    		break;
 	    }
 		
 		// 디스패처 방식 포워딩(재요청)
+		if (nextPage == null) {
+			System.err.println("[ClassroomController] nextPage is null! action=" + action);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "요청한 페이지를 찾을 수 없습니다: " + action);
+			return;
+		}
 		RequestDispatcher dispatch = request.getRequestDispatcher(nextPage);
 		dispatch.forward(request, response);
 		

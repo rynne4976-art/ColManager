@@ -974,5 +974,39 @@ public class ClassroomDAO {
 	    return null;
 	}
 
+	// ── 증명서용: 학생 개인 정보 조회 ───────────────────────────────────────────
+	public StudentVo getStudentInfo(String studentId) {
+		StudentVo student = null;
+		String sql = "SELECT si.student_id, u.user_name, mi.majorname, si.grade, "
+				   + "       si.status, si.admission_date "
+				   + "FROM student_info si "
+				   + "JOIN `user` u  ON si.user_id  = u.user_id "
+				   + "JOIN majorinformation mi ON si.majorcode = mi.majorcode "
+				   + "WHERE si.student_id = ?";
+		try {
+			con   = ds.getConnection();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, studentId);
+			rs    = pstmt.executeQuery();
+			if (rs.next()) {
+				student = new StudentVo();
+				student.setStudent_id(rs.getString("student_id"));
+				student.setUser_name(rs.getString("user_name"));
+				student.setGrade(rs.getInt("grade"));
+				student.setStatus(rs.getString("status"));
+				java.sql.Date ad = rs.getDate("admission_date");
+				if (ad != null) student.setAdmission_date(ad);
+				CourseVo cv = new CourseVo();
+				cv.setMajorname(rs.getString("majorname"));
+				student.setCourse(cv);
+			}
+		} catch (Exception e) {
+			System.out.println("ClassroomDAO.getStudentInfo() 오류: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+		return student;
+	}
 
 }

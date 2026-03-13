@@ -8,7 +8,14 @@
       "Bash(xargs grep:*)",
       "Bash(ls /c/workspace_team/ColManager/src/main/java/Controller/Chat*)",
       "Bash(find /c/workspace_team/ColManager/src/main/webapp/css -name bottom*)",
-      "Bash(grep -rn \"bottom.css\\\\|bottom\\\\.jsp\" /c/workspace_team/ColManager/src/main/webapp/ --include=*.jsp --include=*.css)"
+      "Bash(grep -rn \"bottom.css\\\\|bottom\\\\.jsp\" /c/workspace_team/ColManager/src/main/webapp/ --include=*.jsp --include=*.css)",
+      "Bash(wc -l /c/workspace_team/ColManager/src/main/webapp/view_classroom/certificate/*.jsp)",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\workspace_team\\\\ColManager\\\\src\\\\main\\\\java\\\\Controller\\\\ClassroomController.java'' | Select-Object -Skip 903 -First 8 | ForEach-Object { [System.Text.Encoding]::UTF8.GetBytes\\($_ -join '','' }\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\workspace_team\\\\ColManager\\\\src\\\\main\\\\java\\\\Controller\\\\ClassroomController.java'' | Select-Object -Skip 903 -First 5\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(dir \"C:\\\\workspace_team\\\\ColManager\\\\src\\\\main\\\\webapp\\\\view_classroom\\\\certificate\"\")",
+      "Read(//c/workspace_team/**)"
     ]
   }
 }

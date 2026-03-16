@@ -208,7 +208,7 @@
                                             <button type="button"
                                                     class="btn btn-outline-primary btn-sm action-btn-single"
                                                     onclick="submitSingleUpdate('${student.student_id}', this)">
-                                                개별 수정
+                                                수정
                                             </button>
                                         </td>
                                     </tr>

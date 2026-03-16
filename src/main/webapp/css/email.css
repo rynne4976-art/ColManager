@@ -231,21 +231,26 @@
 }
 
 .float-ai-quick {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 16px 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding: 0 16px 12px;
 }
 
 .float-ai-quick button {
-    border: 1px solid #ced4da;
-    background: #fff;
-    color: #343a40;
-    border-radius: 999px;
-    padding: 7px 11px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
+	border: 1px solid #ced4da;
+	background: #fff;
+	color: #343a40;
+	padding: 7px 11px;
+	border-radius: 999px;
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.float-ai-quick button:hover {
+	background: #2c7be5;
+	color: white;
 }
 
 .float-ai-input {

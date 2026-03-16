@@ -917,13 +917,14 @@ public class ClassroomController extends HttpServlet {
 
 	    	    request.setAttribute("attendanceList", attendanceList);
 
-	    	    classroomCenter = "/view_classroom/attendance/attendanceStudent.jsp";
-	    	    request.setAttribute("classroomCenter", classroomCenter);
+	    	    center = "/view_classroom/attendance/attendanceStudent.jsp";
+	    	    request.setAttribute("classroomCenter", center);
 
 	    	    nextPage = "/view_classroom/classroom.jsp";
+	    	   
 	    	    break;
 
-				// ==========================================================================================
+			// ==========================================================================================
 
 	    	case "/attendanceProfessor.do": 
 	    	    session = request.getSession(false);
@@ -989,14 +990,12 @@ public class ClassroomController extends HttpServlet {
 	    	    request.setAttribute("studentNameKeyword", studentNameKeyword);
 	    	    request.setAttribute("attendanceStatusFilter", attendanceStatusFilter);
 
-	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessor.jsp";
-	    	    request.setAttribute("classroomCenter", classroomCenter);
+	    	    center = "/view_classroom/attendance/attendanceProfessor.jsp";
+	    	    request.setAttribute("classroomCenter", center);
 
 	    	    nextPage = "/view_classroom/classroom.jsp";
 	    	    break;
-	    	
-			// =========================================
-			// 교수 출석 저장
+	
 			// =========================================
 	    	case "/attendanceSave.do": 
 	    	    session = request.getSession(false);
@@ -1175,12 +1174,13 @@ public class ClassroomController extends HttpServlet {
 	    	    request.setAttribute("studentNameKeyword", studentName_Keyword);
 	    	    request.setAttribute("attendanceStatusFilter", attendanceStatus_Filter);
 
-	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessor.jsp";
-	    	    request.setAttribute("classroomCenter", classroomCenter);
+	    	    center = "/view_classroom/attendance/attendanceProfessor.jsp";
+	    	    request.setAttribute("classroomCenter", center);
 
 	    	    nextPage = "/view_classroom/classroom.jsp";
 	    	    break;
 			
+	    	//==========================================================
 	    	case "/attendanceUpdate.do": 
 	    	    session = request.getSession(false);
 	    	    String srole = session != null ? (String) session.getAttribute("role") : null;
@@ -1336,8 +1336,8 @@ public class ClassroomController extends HttpServlet {
 	    	    request.setAttribute("studentNameKeyword", studentNameKeyword_);
 	    	    request.setAttribute("attendanceStatusFilter", attendanceStatusFilter_);
 
-	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessorUpdate.jsp";
-	    	    request.setAttribute("classroomCenter", classroomCenter);
+	    	    center = "/view_classroom/attendance/attendanceProfessorUpdate.jsp";
+	    	    request.setAttribute("classroomCenter", center);
 
 	    	    nextPage = "/view_classroom/classroom.jsp";
 	    	    break;	    		

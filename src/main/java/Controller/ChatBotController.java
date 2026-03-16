@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,9 +34,11 @@ public class ChatBotController extends HttpServlet {
             Properties prop = new Properties();
             InputStream is = getClass().getClassLoader().getResourceAsStream("config.properties");
 
-            if (is != null) {
-                prop.load(is);
+            if (is == null) {
+                throw new ServletException("config.properties 파일을 찾을 수 없습니다.");
             }
+
+            prop.load(is);
 
             apiKey = prop.getProperty("openrouter.apiKey");
             appUrl = prop.getProperty("app.url");
@@ -49,7 +50,7 @@ public class ChatBotController extends HttpServlet {
             chatbotService = new ChatbotService(apiKey, appUrl);
 
         } catch (Exception e) {
-            throw new ServletException("config.properties 로딩 실패", e);
+            throw new ServletException("ChatBotController 초기화 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -65,16 +66,17 @@ public class ChatBotController extends HttpServlet {
         doHandle(request, response);
     }
 
-    protected void doHandle(HttpServletRequest request, HttpServletResponse response)
+    @SuppressWarnings("unchecked")
+    private void doHandle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         String action = request.getPathInfo();
 
-        if (action == null || "/page.do".equals(action)) {
-            request.setAttribute("center", "/common/AIService.jsp");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/main.jsp");
-            dispatcher.forward(request, response);
+        if (action == null || "/".equals(action) || "/page.do".equals(action)) {
+            response.sendRedirect(request.getContextPath() + "/main.bo");
             return;
         }
 
@@ -90,14 +92,16 @@ public class ChatBotController extends HttpServlet {
                 String loginId = null;
                 String role = null;
                 String studentId = null;
+                String professorId = null;
 
                 if (session != null) {
                     loginId = (String) session.getAttribute("id");
                     role = (String) session.getAttribute("role");
                     studentId = (String) session.getAttribute("student_id");
+                    professorId = (String) session.getAttribute("professor_id");
                 }
 
-                String reply = chatbotService.getReply(message, loginId, role, studentId);
+                String reply = chatbotService.getReply(message, loginId, role, studentId, professorId);
 
                 json.put("status", "success");
                 json.put("reply", reply);

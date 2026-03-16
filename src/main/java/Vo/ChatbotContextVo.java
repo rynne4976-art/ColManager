@@ -7,6 +7,7 @@ public class ChatbotContextVo {
     private String loginId;
     private String role;
     private String studentId;
+    private String professorId;
     private String userQuestion;
     private String intent;
 
@@ -14,6 +15,10 @@ public class ChatbotContextVo {
     private ArrayList<EnrollmentVo> enrollmentList;
     private ArrayList<StudentVo> gradeList;
     private ArrayList<BoardVo> noticeList;
+    private ArrayList<AttendanceVo> attendanceList;
+    private ArrayList<CourseVo> professorCourseList;
+
+    private String attendanceSummary;
 
     public String getLoginId() {
         return loginId;
@@ -37,6 +42,14 @@ public class ChatbotContextVo {
 
     public void setStudentId(String studentId) {
         this.studentId = studentId;
+    }
+
+    public String getProfessorId() {
+        return professorId;
+    }
+
+    public void setProfessorId(String professorId) {
+        this.professorId = professorId;
     }
 
     public String getUserQuestion() {
@@ -85,5 +98,29 @@ public class ChatbotContextVo {
 
     public void setNoticeList(ArrayList<BoardVo> noticeList) {
         this.noticeList = noticeList;
+    }
+
+    public ArrayList<AttendanceVo> getAttendanceList() {
+        return attendanceList;
+    }
+
+    public void setAttendanceList(ArrayList<AttendanceVo> attendanceList) {
+        this.attendanceList = attendanceList;
+    }
+
+    public ArrayList<CourseVo> getProfessorCourseList() {
+        return professorCourseList;
+    }
+
+    public void setProfessorCourseList(ArrayList<CourseVo> professorCourseList) {
+        this.professorCourseList = professorCourseList;
+    }
+
+    public String getAttendanceSummary() {
+        return attendanceSummary;
+    }
+
+    public void setAttendanceSummary(String attendanceSummary) {
+        this.attendanceSummary = attendanceSummary;
     }
 }

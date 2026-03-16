@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import Dao.StudentDAO;
+import Vo.AttendanceVo;
 import Vo.BoardVo;
 import Vo.ChatbotContextVo;
+import Vo.CourseVo;
 import Vo.EnrollmentVo;
 import Vo.StudentVo;
 import webSocket.ChatServer;
@@ -28,7 +30,7 @@ public class ChatbotService {
         this.chatServer = new ChatServer();
     }
 
-    public String getReply(String userMessage, String loginId, String role, String studentId) throws Exception {
+    public String getReply(String userMessage, String loginId, String role, String studentId, String professorId) throws Exception {
         if (userMessage == null || userMessage.trim().isEmpty()) {
             return "질문을 입력해주세요.";
         }
@@ -37,6 +39,7 @@ public class ChatbotService {
         context.setLoginId(loginId);
         context.setRole(role);
         context.setStudentId(studentId);
+        context.setProfessorId(professorId);
         context.setUserQuestion(userMessage);
         context.setIntent(analyzeIntent(userMessage));
 
@@ -50,6 +53,9 @@ public class ChatbotService {
     private String analyzeIntent(String message) {
         String msg = message == null ? "" : message.trim();
 
+        if (msg.contains("출결") || msg.contains("출석") || msg.contains("결석") || msg.contains("지각")) {
+            return "ATTENDANCE";
+        }
         if (msg.contains("시간표") || msg.contains("수업")) {
             return "TIMETABLE";
         }
@@ -70,6 +76,7 @@ public class ChatbotService {
         String role = context.getRole();
         String loginId = context.getLoginId();
         String studentId = context.getStudentId();
+        String professorId = context.getProfessorId();
         String intent = context.getIntent();
 
         if ("학생".equals(role) && loginId != null && !loginId.trim().isEmpty()) {
@@ -79,7 +86,7 @@ public class ChatbotService {
 
         if ("학생".equals(role) && studentId != null && !studentId.trim().isEmpty()) {
 
-            if ("TIMETABLE".equals(intent) || "COURSE".equals(intent)) {
+            if ("TIMETABLE".equals(intent) || "COURSE".equals(intent) || "GENERAL".equals(intent)) {
                 ArrayList<EnrollmentVo> enrollments = classroomService.serviceStudentCourseSearch(studentId);
                 context.setEnrollmentList(enrollments);
             }
@@ -89,7 +96,7 @@ public class ChatbotService {
                 context.setGradeList(gradeList);
             }
 
-            if ("NOTICE".equals(intent)) {
+            if ("NOTICE".equals(intent) || "GENERAL".equals(intent)) {
                 Map<String, List> dataMap = classroomService.getAssignmentsAndNotices(studentId);
                 List noticeRaw = dataMap.get("notices");
 
@@ -105,7 +112,51 @@ public class ChatbotService {
 
                 context.setNoticeList(noticeList);
             }
+
+            if ("ATTENDANCE".equals(intent) || "GENERAL".equals(intent)) {
+                ArrayList<AttendanceVo> attendanceList = classroomService.serviceAttendanceByStudent(studentId);
+                context.setAttendanceList(attendanceList);
+                context.setAttendanceSummary(buildAttendanceSummary(attendanceList));
+            }
         }
+
+        if ("교수".equals(role) && professorId != null && !professorId.trim().isEmpty()) {
+            if ("COURSE".equals(intent) || "ATTENDANCE".equals(intent) || "NOTICE".equals(intent) || "GENERAL".equals(intent)) {
+                ArrayList<CourseVo> professorCourseList = classroomService.serviceCourseSearch(professorId);
+                context.setProfessorCourseList(professorCourseList);
+            }
+        }
+    }
+
+    private String buildAttendanceSummary(ArrayList<AttendanceVo> attendanceList) {
+        if (attendanceList == null || attendanceList.isEmpty()) {
+            return "조회된 출결 정보가 없습니다.";
+        }
+
+        int present = 0;
+        int absent = 0;
+        int late = 0;
+        int etc = 0;
+
+        for (AttendanceVo vo : attendanceList) {
+            if (vo == null || vo.getStatus() == null) {
+                continue;
+            }
+
+            String status = vo.getStatus().trim();
+
+            if ("출석".equals(status)) {
+                present++;
+            } else if ("결석".equals(status)) {
+                absent++;
+            } else if ("지각".equals(status)) {
+                late++;
+            } else {
+                etc++;
+            }
+        }
+
+        return "총 " + attendanceList.size() + "건 / 출석 " + present + "건 / 결석 " + absent + "건 / 지각 " + late + "건 / 기타 " + etc + "건";
     }
 
     private String buildSystemPrompt(ChatbotContextVo context) {
@@ -114,9 +165,10 @@ public class ChatbotService {
         sb.append("당신은 ColManager 학사 지원 프로그램의 AI 도우미입니다.\n");
         sb.append("답변은 반드시 한국어로, 친절하고 정확하고 이해하기 쉽게 작성하세요.\n");
         sb.append("모르는 정보는 추측하지 말고 확인이 필요하다고 답하세요.\n");
-        sb.append("질문이 시스템 메뉴 사용법이면 메뉴 경로나 다음 행동을 함께 안내하세요.\n");
-        sb.append("로그인 사용자 정보가 있으면 그 정보에 맞춰 개인화해서 답변하세요.\n");
-        sb.append("DB에서 조회된 정보가 있으면 그것을 최우선 근거로 사용하세요.\n\n");
+        sb.append("DB에서 조회된 정보가 있으면 그것을 최우선 근거로 사용하세요.\n");
+        sb.append("질문이 시스템 메뉴 사용법이면 메뉴 경로나 다음 행동도 함께 안내하세요.\n");
+        sb.append("로그인 사용자 정보가 있으면 그 정보에 맞춰 개인화해서 답하세요.\n");
+        sb.append("출결/성적/수강/공지 질문은 DB 조회 결과를 벗어나 추측하지 마세요.\n\n");
 
         sb.append("[질문 의도]\n");
         sb.append(nvl(context.getIntent())).append("\n\n");
@@ -127,7 +179,7 @@ public class ChatbotService {
         if (context.getStudent() != null) {
             StudentVo student = context.getStudent();
 
-            sb.append("[로그인 사용자 정보]\n");
+            sb.append("[로그인 학생 정보]\n");
             sb.append("이름: ").append(nvl(student.getUser_name())).append("\n");
             sb.append("아이디: ").append(nvl(student.getUser_id())).append("\n");
             sb.append("학번: ").append(nvl(student.getStudent_id())).append("\n");
@@ -166,6 +218,36 @@ public class ChatbotService {
             sb.append("\n");
         }
 
+        if (context.getAttendanceSummary() != null && !context.getAttendanceSummary().trim().isEmpty()) {
+            sb.append("[출결 요약]\n");
+            sb.append(context.getAttendanceSummary()).append("\n\n");
+        }
+
+        if (context.getAttendanceList() != null && !context.getAttendanceList().isEmpty()) {
+            sb.append("[최근 출결 내역]\n");
+
+            int limit = Math.min(context.getAttendanceList().size(), 10);
+            for (int i = 0; i < limit; i++) {
+                AttendanceVo att = context.getAttendanceList().get(i);
+                sb.append("- ")
+                  .append(att.getClass_date())
+                  .append(" / ")
+                  .append(nvl(att.getCourse_name()))
+                  .append(" (")
+                  .append(nvl(att.getCourse_id()))
+                  .append(")")
+                  .append(" / 상태: ")
+                  .append(nvl(att.getStatus()));
+
+                if (att.getRemark() != null && !att.getRemark().trim().isEmpty()) {
+                    sb.append(" / 비고: ").append(att.getRemark());
+                }
+
+                sb.append("\n");
+            }
+            sb.append("\n");
+        }
+
         if (context.getNoticeList() != null && !context.getNoticeList().isEmpty()) {
             sb.append("[최근 공지사항]\n");
             for (BoardVo board : context.getNoticeList()) {
@@ -180,13 +262,28 @@ public class ChatbotService {
             sb.append("\n");
         }
 
+        if (context.getProfessorCourseList() != null && !context.getProfessorCourseList().isEmpty()) {
+            sb.append("[교수 담당 강의 목록]\n");
+            for (CourseVo course : context.getProfessorCourseList()) {
+                sb.append("- ")
+                  .append(nvl(course.getCourse_name()))
+                  .append(" (")
+                  .append(nvl(course.getCourse_id()))
+                  .append(")\n");
+            }
+            sb.append("\n");
+        }
+
         sb.append("[응답 규칙]\n");
         sb.append("1. 로그인하지 않았는데 개인 정보가 필요한 질문이면 로그인 후 이용 가능하다고 안내하세요.\n");
-        sb.append("2. 학생 정보가 조회되면 그 학생 기준으로 답하세요.\n");
-        sb.append("3. 공지사항 질문이면 최근 공지 제목을 우선 알려주세요.\n");
-        sb.append("4. 시간표/수강 질문이면 현재 수강 강의를 기준으로 답하세요.\n");
-        sb.append("5. 성적 질문이면 조회된 성적 정보를 바탕으로 설명하세요.\n");
-        sb.append("6. 불필요하게 길지 않게 답변하세요.\n");
+        sb.append("2. 학생 질문은 반드시 해당 학생 DB 조회 결과를 기준으로 답하세요.\n");
+        sb.append("3. 교수 질문은 교수 담당 강의 목록 기준으로 설명하세요.\n");
+        sb.append("4. 출결 질문이면 출석/결석/지각 수치와 최근 내역을 먼저 요약하세요.\n");
+        sb.append("5. 성적 질문이면 조회된 성적 정보를 표처럼 정리해서 설명하세요.\n");
+        sb.append("6. 공지사항 질문이면 최근 공지 제목을 우선 알려주세요.\n");
+        sb.append("7. 시스템 기능 안내가 필요하면 관련 메뉴 경로도 함께 안내하세요.\n");
+        sb.append("8. DB에 없는 정보는 절대 추측하지 마세요.\n");
+        sb.append("9. 답변은 너무 길지 않되, 핵심 정보는 빠지지 않게 작성하세요.\n");
 
         return sb.toString();
     }

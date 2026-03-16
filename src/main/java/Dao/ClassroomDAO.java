@@ -1,6 +1,7 @@
 package Dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -18,6 +19,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import Vo.AssignmentVo;
+import Vo.AttendanceVo;
 import Vo.BoardVo;
 import Vo.ClassroomVo;
 import Vo.CourseVo;
@@ -1007,6 +1009,277 @@ public class ClassroomDAO {
 			closeResource();
 		}
 		return student;
+	}
+	
+	// 학생 개인 출결 조회
+	public ArrayList<AttendanceVo> getAttendanceByStudent(String studentId) {
+	    ArrayList<AttendanceVo> list = new ArrayList<AttendanceVo>();
+
+	    String sql =
+	        "SELECT a.attendance_id, a.student_id, a.course_id, c.course_name, " +
+	        "       a.class_date, a.status, a.remark, a.check_time, a.created_at, a.updated_at " +
+	        "FROM attendance a " +
+	        "JOIN course c ON a.course_id = c.course_id " +
+	        "WHERE a.student_id = ? " +
+	        "ORDER BY a.class_date DESC, a.course_id";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, studentId);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            AttendanceVo vo = new AttendanceVo();
+	            vo.setAttendance_id(rs.getInt("attendance_id"));
+	            vo.setStudent_id(rs.getString("student_id"));
+	            vo.setCourse_id(rs.getString("course_id"));
+	            vo.setCourse_name(rs.getString("course_name"));
+	            vo.setClass_date(rs.getDate("class_date"));
+	            vo.setStatus(rs.getString("status"));
+	            vo.setRemark(rs.getString("remark"));
+	            vo.setCheck_time(rs.getTimestamp("check_time"));
+	            vo.setCreated_at(rs.getTimestamp("created_at"));
+	            vo.setUpdated_at(rs.getTimestamp("updated_at"));
+	            list.add(vo);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return list;
+	}
+
+	// 특정 과목 + 날짜 출결 조회
+	public ArrayList<AttendanceVo> getAttendanceByCourseAndDate(String courseId, Date classDate) {
+	    ArrayList<AttendanceVo> list = new ArrayList<AttendanceVo>();
+
+	    String sql =
+	        "SELECT * " +
+	        "FROM attendance " +
+	        "WHERE course_id = ? AND class_date = ? " +
+	        "ORDER BY student_id";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, courseId);
+	        pstmt.setDate(2, classDate);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            AttendanceVo vo = new AttendanceVo();
+	            vo.setAttendance_id(rs.getInt("attendance_id"));
+	            vo.setStudent_id(rs.getString("student_id"));
+	            vo.setCourse_id(rs.getString("course_id"));
+	            vo.setClass_date(rs.getDate("class_date"));
+	            vo.setStatus(rs.getString("status"));
+	            vo.setRemark(rs.getString("remark"));
+	            vo.setCheck_time(rs.getTimestamp("check_time"));
+	            list.add(vo);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return list;
+	}
+
+	// 수강 여부 검증
+	public boolean isEnrolledStudent(String studentId, String courseId) {
+	    String sql =
+	        "SELECT COUNT(*) " +
+	        "FROM enrollment " +
+	        "WHERE student_id = ? AND course_id = ?";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, studentId);
+	        pstmt.setString(2, courseId);
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0;
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return false;
+	}
+	
+	public ArrayList<StudentVo> studentSearch(String course_id_, String studentNameKeyword) {
+
+	    ArrayList<StudentVo> studentList = new ArrayList<StudentVo>();
+
+	    StudentVo student;
+	    CourseVo course;
+
+	    try {
+
+	        con = ds.getConnection();
+
+	        StringBuilder sql = new StringBuilder();
+	        sql.append("SELECT m.majorname, s.student_id, u.user_name, ");
+	        sql.append("g.midtest_score, g.finaltest_score, g.assignment_score, g.score ");
+	        sql.append("FROM enrollment e ");
+	        sql.append("JOIN student_info s ON e.student_id = s.student_id ");
+	        sql.append("JOIN user u ON s.user_id = u.user_id ");
+	        sql.append("LEFT JOIN majorinformation m ON s.majorcode = m.majorcode ");
+	        sql.append("LEFT JOIN grade g ON g.student_id = s.student_id AND g.course_id = e.course_id ");
+	        sql.append("WHERE e.course_id = ? ");
+
+	        if (studentNameKeyword != null && !studentNameKeyword.trim().equals("")) {
+	            sql.append("AND u.user_name LIKE ? ");
+	        }
+
+	        sql.append("ORDER BY s.student_id");
+
+	        pstmt = con.prepareStatement(sql.toString());
+	        pstmt.setString(1, course_id_);
+
+	        if (studentNameKeyword != null && !studentNameKeyword.trim().equals("")) {
+	            pstmt.setString(2, "%" + studentNameKeyword.trim() + "%");
+	        }
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            student = new StudentVo();
+	            student.setStudent_id(rs.getString("student_id"));
+	            student.setUser_name(rs.getString("user_name"));
+	            student.setMidtest_score(rs.getInt("midtest_score"));
+	            student.setFinaltest_score(rs.getInt("finaltest_score"));
+	            student.setAssignment_score(rs.getInt("assignment_score"));
+	            student.setScore(rs.getFloat("score"));
+
+	            course = new CourseVo();
+	            course.setMajorname(rs.getString("majorname"));
+
+	            student.setCourse(course);
+
+	            studentList.add(student);
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("ClassroomDAO의 studentSearch 메소드에서 오류");
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return studentList;
+	}
+	
+	public boolean existsAttendance(String studentId, String courseId, Date classDate) {
+	    String sql =
+	        "SELECT COUNT(*) " +
+	        "FROM attendance " +
+	        "WHERE student_id = ? AND course_id = ? AND class_date = ?";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, studentId);
+	        pstmt.setString(2, courseId);
+	        pstmt.setDate(3, classDate);
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0;
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return false;
+	}
+
+	// 출결 등록 전용
+	public int insertAttendance(AttendanceVo vo) {
+	    String sql =
+	        "INSERT INTO attendance (student_id, course_id, class_date, status, remark) " +
+	        "VALUES (?, ?, ?, ?, ?)";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, vo.getStudent_id());
+	        pstmt.setString(2, vo.getCourse_id());
+	        pstmt.setDate(3, vo.getClass_date());
+	        pstmt.setString(4, vo.getStatus());
+	        pstmt.setString(5, vo.getRemark());
+
+	        return pstmt.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return 0;
+	}
+	
+	public int updateAttendance(AttendanceVo vo) {
+	    String sql =
+	        "UPDATE attendance " +
+	        "SET status = ?, remark = ?, check_time = CURRENT_TIMESTAMP " +
+	        "WHERE student_id = ? AND course_id = ? AND class_date = ?";
+
+	    Connection con = null;
+	    PreparedStatement pstmt = null;
+
+	    try {
+	        con = ds.getConnection();
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, vo.getStatus());
+	        pstmt.setString(2, vo.getRemark());
+	        pstmt.setString(3, vo.getStudent_id());
+	        pstmt.setString(4, vo.getCourse_id());
+	        pstmt.setDate(5, vo.getClass_date());
+
+	        return pstmt.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return 0;
 	}
 
 }

@@ -3,6 +3,7 @@ package Controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +46,7 @@ import Service.BoardService;
 import Service.ClassroomService;
 import Service.MenuItemService;
 import Service.StudentService;
+import Vo.AttendanceVo;
 import Vo.BoardVo;
 import Vo.ClassroomVo;
 import Vo.CourseVo;
@@ -56,6 +59,7 @@ public class ClassroomController extends HttpServlet {
 	
 	ClassroomService classroomservice;
 	BoardService boardservice;
+	String classroomCenter = null;
 	
 	@Override
 	public void init() throws ServletException {
@@ -897,6 +901,446 @@ public class ClassroomController extends HttpServlet {
 	    	}
 
 	    //==========================================================================================
+
+	    	case "/attendanceStudent.do":
+	    	    session = request.getSession(false);
+	    	    String role = session != null ? (String) session.getAttribute("role") : null;
+
+	    	    if (!"학생".equals(role)) {
+	    	        response.sendRedirect(request.getContextPath() + "/member/main.bo");
+	    	        return;
+	    	    }
+
+	    	    String studentId_ = (String) session.getAttribute("student_id");
+
+	    	    ArrayList<AttendanceVo> attendanceList = classroomservice.serviceAttendanceByStudent(studentId_);
+
+	    	    request.setAttribute("attendanceList", attendanceList);
+
+	    	    classroomCenter = "/view_classroom/attendance/attendanceStudent.jsp";
+	    	    request.setAttribute("classroomCenter", classroomCenter);
+
+	    	    nextPage = "/view_classroom/classroom.jsp";
+	    	    break;
+
+				// ==========================================================================================
+
+	    	case "/attendanceProfessor.do": 
+	    	    session = request.getSession(false);
+	    	    String attrole = session != null ? (String) session.getAttribute("role") : null;
+
+	    	    if (!"교수".equals(attrole)) {
+	    	        response.sendRedirect(request.getContextPath() + "/member/main.bo");
+	    	        return;
+	    	    }
+
+	    	    String professorId = (String) session.getAttribute("professor_id");
+	    	    String selectedCourseId = request.getParameter("course_id");
+	    	    String classDateStr = request.getParameter("class_date");
+	    	    String studentNameKeyword = request.getParameter("student_name");
+	    	    String attendanceStatusFilter = request.getParameter("attendance_status");
+
+	    	    ArrayList<CourseVo> professorCourseList =
+	    	            classroomservice.serviceCourseSearch(professorId);
+
+	    	    ArrayList<StudentVo> attendstudentList = new ArrayList<StudentVo>();
+	    	    ArrayList<AttendanceVo> attendance_List = new ArrayList<AttendanceVo>();
+
+	    	    if (selectedCourseId != null && !selectedCourseId.trim().equals("")) {
+	    	        attendstudentList = classroomservice.serviceStudentSearch(selectedCourseId, studentNameKeyword);
+
+	    	        if (classDateStr != null && !classDateStr.trim().equals("")) {
+	    	            Date classDate = Date.valueOf(classDateStr);
+	    	            attendance_List =
+	    	                    classroomservice.serviceAttendanceByCourseAndDate(selectedCourseId, classDate);
+	    	        }
+	    	    }
+
+	    	    Map<String, AttendanceVo> attendanceMap = new HashMap<String, AttendanceVo>();
+	    	    for (AttendanceVo att : attendance_List) {
+	    	        attendanceMap.put(att.getStudent_id(), att);
+	    	    }
+
+	    	    if (attendanceStatusFilter != null && !attendanceStatusFilter.trim().equals("")) {
+	    	        ArrayList<StudentVo> filteredStudentList = new ArrayList<StudentVo>();
+
+	    	        for (StudentVo student : attendstudentList) {
+	    	            AttendanceVo savedAtt = attendanceMap.get(student.getStudent_id());
+
+	    	            if ("미등록".equals(attendanceStatusFilter)) {
+	    	                if (savedAtt == null) {
+	    	                    filteredStudentList.add(student);
+	    	                }
+	    	            } else {
+	    	                if (savedAtt != null && attendanceStatusFilter.equals(savedAtt.getStatus())) {
+	    	                    filteredStudentList.add(student);
+	    	                }
+	    	            }
+	    	        }
+
+	    	        attendstudentList = filteredStudentList;
+	    	    }
+
+	    	    request.setAttribute("professorCourseList", professorCourseList);
+	    	    request.setAttribute("studentList", attendstudentList);
+	    	    request.setAttribute("attendanceMap", attendanceMap);
+	    	    request.setAttribute("selectedCourseId", selectedCourseId);
+	    	    request.setAttribute("classDate", classDateStr);
+	    	    request.setAttribute("studentNameKeyword", studentNameKeyword);
+	    	    request.setAttribute("attendanceStatusFilter", attendanceStatusFilter);
+
+	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessor.jsp";
+	    	    request.setAttribute("classroomCenter", classroomCenter);
+
+	    	    nextPage = "/view_classroom/classroom.jsp";
+	    	    break;
+	    	
+			// =========================================
+			// 교수 출석 저장
+			// =========================================
+	    	case "/attendanceSave.do": 
+	    	    session = request.getSession(false);
+	    	    String saverole = session != null ? (String) session.getAttribute("role") : null;
+
+	    	    if (!"교수".equals(saverole)) {
+	    	        response.sendRedirect(request.getContextPath() + "/member/main.bo");
+	    	        return;
+	    	    }
+
+	    	    String course_Id = request.getParameter("course_id");
+	    	    String classDate_Str = request.getParameter("class_date");
+	    	    String studentName_Keyword = request.getParameter("student_name");
+	    	    String attendanceStatus_Filter = request.getParameter("attendance_status");
+	    	    String saveMode = request.getParameter("saveMode");
+	    	    String singleStudentId = request.getParameter("single_student_id");
+	    	    String[] checkedStudentIds = request.getParameterValues("student_id");
+
+	    	    int successCount = 0;
+	    	    int duplicateCount = 0;
+	    	    int invalidEnrollmentCount = 0;
+	    	    int invalidStatusCount = 0;
+
+	    	    if (course_Id == null || course_Id.trim().equals("")
+	    	            || classDate_Str == null || classDate_Str.trim().equals("")) {
+
+	    	        request.setAttribute("attendanceMessage", "과목 및 수업일을 확인하여 주십시오.");
+	    	        request.setAttribute("attendanceMessageType", "warning");
+
+	    	    } else {
+	    	        Date classDate = Date.valueOf(classDate_Str);
+
+	    	        if ("single".equals(saveMode)) {
+	    	            if (singleStudentId == null || singleStudentId.trim().equals("")) {
+	    	                request.setAttribute("attendanceMessage", "개별 등록 대상 학생이 없습니다.");
+	    	                request.setAttribute("attendanceMessageType", "warning");
+	    	            } else {
+	    	                String status = request.getParameter("status_" + singleStudentId);
+	    	                String remark = request.getParameter("remark_" + singleStudentId);
+
+	    	                if (status == null || status.trim().equals("")) {
+	    	                    request.setAttribute("attendanceMessage", "출석상태를 선택하여 주십시오.");
+	    	                    request.setAttribute("attendanceMessageType", "warning");
+	    	                } else {
+	    	                    AttendanceVo vo = new AttendanceVo();
+	    	                    vo.setStudent_id(singleStudentId);
+	    	                    vo.setCourse_id(course_Id);
+	    	                    vo.setClass_date(classDate);
+	    	                    vo.setStatus(status);
+	    	                    vo.setRemark(remark);
+
+	    	                    int saveResult = classroomservice.serviceInsertAttendance(vo);
+
+	    	                    if (saveResult == 1) {
+	    	                        successCount++;
+	    	                    } else if (saveResult == -1) {
+	    	                        invalidEnrollmentCount++;
+	    	                    } else if (saveResult == -2) {
+	    	                        duplicateCount++;
+	    	                    }
+	    	                }
+	    	            }
+
+	    	        } else if ("selected".equals(saveMode)) {
+	    	            if (checkedStudentIds == null || checkedStudentIds.length == 0) {
+	    	                request.setAttribute("attendanceMessage", "등록할 학생을 선택하여 주십시오.");
+	    	                request.setAttribute("attendanceMessageType", "warning");
+	    	            } else {
+	    	                for (String stdId : checkedStudentIds) {
+	    	                    String status = request.getParameter("status_" + stdId);
+	    	                    String remark = request.getParameter("remark_" + stdId);
+
+	    	                    if (status == null || status.trim().equals("")) {
+	    	                        invalidStatusCount++;
+	    	                        continue;
+	    	                    }
+
+	    	                    AttendanceVo vo = new AttendanceVo();
+	    	                    vo.setStudent_id(stdId);
+	    	                    vo.setCourse_id(course_Id);
+	    	                    vo.setClass_date(classDate);
+	    	                    vo.setStatus(status);
+	    	                    vo.setRemark(remark);
+
+	    	                    int saveResult = classroomservice.serviceInsertAttendance(vo);
+
+	    	                    if (saveResult == 1) {
+	    	                        successCount++;
+	    	                    } else if (saveResult == -1) {
+	    	                        invalidEnrollmentCount++;
+	    	                    } else if (saveResult == -2) {
+	    	                        duplicateCount++;
+	    	                    }
+	    	                }
+	    	            }
+	    	        }
+
+	    	        if (request.getAttribute("attendanceMessage") == null) {
+	    	            StringBuilder msg = new StringBuilder();
+	    	            String msgType = "success";
+
+	    	            if (successCount > 0) {
+	    	                msg.append(successCount).append("건 등록되었습니다. ");
+	    	            }
+	    	            if (duplicateCount > 0) {
+	    	                msg.append("이미 등록된 출결 ").append(duplicateCount).append("건은 제외되었습니다. ");
+	    	                msgType = "warning";
+	    	            }
+	    	            if (invalidEnrollmentCount > 0) {
+	    	                msg.append("수강 정보가 없는 학생 ").append(invalidEnrollmentCount).append("건은 제외되었습니다. ");
+	    	                msgType = "warning";
+	    	            }
+	    	            if (invalidStatusCount > 0) {
+	    	                msg.append("출석상태 미선택 ").append(invalidStatusCount).append("건은 제외되었습니다. ");
+	    	                msgType = "warning";
+	    	            }
+
+	    	            if (msg.length() == 0) {
+	    	                msg.append("등록 가능한 데이터가 없습니다.");
+	    	                msgType = "warning";
+	    	            }
+
+	    	            request.setAttribute("attendanceMessage", msg.toString().trim());
+	    	            request.setAttribute("attendanceMessageType", msgType);
+	    	        }
+	    	    }
+
+	    	    String professor_Id = (String) session.getAttribute("professor_id");
+
+	    	    ArrayList<CourseVo> professorCourse_List =
+	    	            classroomservice.serviceCourseSearch(professor_Id);
+
+	    	    ArrayList<StudentVo> attstudentList = new ArrayList<StudentVo>();
+	    	    ArrayList<AttendanceVo> attendanceSaveList = new ArrayList<AttendanceVo>();
+
+	    	    if (course_Id != null && !course_Id.trim().equals("")) {
+	    	        attstudentList = classroomservice.serviceStudentSearch(course_Id, studentName_Keyword);
+
+	    	        if (classDate_Str != null && !classDate_Str.trim().equals("")) {
+	    	            Date classDate = Date.valueOf(classDate_Str);
+	    	            attendanceSaveList =
+	    	                    classroomservice.serviceAttendanceByCourseAndDate(course_Id, classDate);
+	    	        }
+	    	    }
+
+	    	    Map<String, AttendanceVo> attendance_Map = new HashMap<String, AttendanceVo>();
+	    	    for (AttendanceVo att : attendanceSaveList) {
+	    	        attendance_Map.put(att.getStudent_id(), att);
+	    	    }
+
+	    	    if (attendanceStatus_Filter != null && !attendanceStatus_Filter.trim().equals("")) {
+	    	        ArrayList<StudentVo> filteredStudentList = new ArrayList<StudentVo>();
+
+	    	        for (StudentVo student : attstudentList) {
+	    	            AttendanceVo savedAtt = attendance_Map.get(student.getStudent_id());
+
+	    	            if ("미등록".equals(attendanceStatus_Filter)) {
+	    	                if (savedAtt == null) {
+	    	                    filteredStudentList.add(student);
+	    	                }
+	    	            } else {
+	    	                if (savedAtt != null && attendanceStatus_Filter.equals(savedAtt.getStatus())) {
+	    	                    filteredStudentList.add(student);
+	    	                }
+	    	            }
+	    	        }
+
+	    	        attstudentList = filteredStudentList;
+	    	    }
+
+	    	    request.setAttribute("professorCourseList", professorCourse_List);
+	    	    request.setAttribute("studentList", attstudentList);
+	    	    request.setAttribute("attendanceMap", attendance_Map);
+	    	    request.setAttribute("selectedCourseId", course_Id);
+	    	    request.setAttribute("classDate", classDate_Str);
+	    	    request.setAttribute("studentNameKeyword", studentName_Keyword);
+	    	    request.setAttribute("attendanceStatusFilter", attendanceStatus_Filter);
+
+	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessor.jsp";
+	    	    request.setAttribute("classroomCenter", classroomCenter);
+
+	    	    nextPage = "/view_classroom/classroom.jsp";
+	    	    break;
+			
+	    	case "/attendanceUpdate.do": 
+	    	    session = request.getSession(false);
+	    	    String srole = session != null ? (String) session.getAttribute("role") : null;
+
+	    	    if (!"교수".equals(srole)) {
+	    	        response.sendRedirect(request.getContextPath() + "/member/main.bo");
+	    	        return;
+	    	    }
+
+	    	    String courseId_ = request.getParameter("course_id");
+	    	    String class_DateStr = request.getParameter("class_date");
+	    	    String studentNameKeyword_ = request.getParameter("student_name");
+	    	    String attendanceStatusFilter_ = request.getParameter("attendance_status");
+	    	    String updateMode = request.getParameter("updateMode");
+	    	    String singleStudent_Id = request.getParameter("single_student_id");
+	    	    String[] checkedStudent_Ids = request.getParameterValues("student_id");
+
+	    	    int success_Count = 0;
+	    	    int notFoundCount = 0;
+	    	    int invalidStatus_Count = 0;
+
+	    	    if (courseId_ == null || courseId_.trim().equals("")
+	    	            || class_DateStr == null || class_DateStr.trim().equals("")) {
+
+	    	        request.setAttribute("attendanceMessage", "과목 및 수업일을 확인하여 주십시오.");
+	    	        request.setAttribute("attendanceMessageType", "warning");
+
+	    	    } else {
+	    	        Date classDate = Date.valueOf(class_DateStr);
+
+	    	        if ("single".equals(updateMode)) {
+	    	            if (singleStudent_Id == null || singleStudent_Id.trim().equals("")) {
+	    	                request.setAttribute("attendanceMessage", "개별 수정 대상 학생이 없습니다.");
+	    	                request.setAttribute("attendanceMessageType", "warning");
+	    	            } else {
+	    	                String status = request.getParameter("status_" + singleStudent_Id);
+	    	                String remark = request.getParameter("remark_" + singleStudent_Id);
+
+	    	                if (status == null || status.trim().equals("")) {
+	    	                    request.setAttribute("attendanceMessage", "출석상태를 선택하여 주십시오.");
+	    	                    request.setAttribute("attendanceMessageType", "warning");
+	    	                } else {
+	    	                    AttendanceVo vo = new AttendanceVo();
+	    	                    vo.setStudent_id(singleStudent_Id);
+	    	                    vo.setCourse_id(courseId_);
+	    	                    vo.setClass_date(classDate);
+	    	                    vo.setStatus(status);
+	    	                    vo.setRemark(remark);
+
+	    	                    int updateResult = classroomservice.serviceUpdateAttendance(vo);
+
+	    	                    if (updateResult == 1) {
+	    	                        success_Count++;
+	    	                    } else if (updateResult == -1) {
+	    	                        notFoundCount++;
+	    	                    }
+	    	                }
+	    	            }
+
+	    	        } else if ("selected".equals(updateMode)) {
+	    	            if (checkedStudent_Ids == null || checkedStudent_Ids.length == 0) {
+	    	                request.setAttribute("attendanceMessage", "수정할 학생을 선택하여 주십시오.");
+	    	                request.setAttribute("attendanceMessageType", "warning");
+	    	            } else {
+	    	                for (String stdId : checkedStudent_Ids) {
+	    	                    String status = request.getParameter("status_" + stdId);
+	    	                    String remark = request.getParameter("remark_" + stdId);
+
+	    	                    if (status == null || status.trim().equals("")) {
+	    	                        invalidStatus_Count++;
+	    	                        continue;
+	    	                    }
+
+	    	                    AttendanceVo vo = new AttendanceVo();
+	    	                    vo.setStudent_id(stdId);
+	    	                    vo.setCourse_id(courseId_);
+	    	                    vo.setClass_date(classDate);
+	    	                    vo.setStatus(status);
+	    	                    vo.setRemark(remark);
+
+	    	                    int updateResult = classroomservice.serviceUpdateAttendance(vo);
+
+	    	                    if (updateResult == 1) {
+	    	                        success_Count++;
+	    	                    } else if (updateResult == -1) {
+	    	                        notFoundCount++;
+	    	                    }
+	    	                }
+	    	            }
+	    	        }
+
+	    	        if (request.getAttribute("attendanceMessage") == null) {
+	    	            StringBuilder msg = new StringBuilder();
+	    	            String msgType = "success";
+
+	    	            if (success_Count > 0) {
+	    	                msg.append(success_Count).append("건 수정되었습니다. ");
+	    	            }
+	    	            if (notFoundCount > 0) {
+	    	                msg.append("등록된 출결이 없는 학생 ").append(notFoundCount).append("건은 제외되었습니다. ");
+	    	                msgType = "warning";
+	    	            }
+	    	            if (invalidStatus_Count > 0) {
+	    	                msg.append("출석상태 미선택 ").append(invalidStatus_Count).append("건은 제외되었습니다. ");
+	    	                msgType = "warning";
+	    	            }
+
+	    	            request.setAttribute("attendanceMessage", msg.toString().trim());
+	    	            request.setAttribute("attendanceMessageType", msgType);
+	    	        }
+	    	    }
+
+	    	    String professorId_ = (String) session.getAttribute("professor_id");
+
+	    	    ArrayList<CourseVo> professorCourseList_ =
+	    	            classroomservice.serviceCourseSearch(professorId_);
+
+	    	    ArrayList<StudentVo> attendstudentList_ = new ArrayList<StudentVo>();
+	    	    ArrayList<AttendanceVo> attendanceListForUpdate = new ArrayList<AttendanceVo>();
+
+	    	    if (courseId_ != null && !courseId_.trim().equals("")) {
+	    	        attendstudentList_ = classroomservice.serviceStudentSearch(courseId_, studentNameKeyword_);
+
+	    	        if (class_DateStr != null && !class_DateStr.trim().equals("")) {
+	    	            Date classDate = Date.valueOf(class_DateStr);
+	    	            attendanceListForUpdate =
+	    	                    classroomservice.serviceAttendanceByCourseAndDate(courseId_, classDate);
+	    	        }
+	    	    }
+
+	    	    Map<String, AttendanceVo> attendanceMap_ = new HashMap<String, AttendanceVo>();
+	    	    for (AttendanceVo att : attendanceListForUpdate) {
+	    	        attendanceMap_.put(att.getStudent_id(), att);
+	    	    }
+
+	    	    ArrayList<StudentVo> updateTargetList = new ArrayList<StudentVo>();
+	    	    for (StudentVo student : attendstudentList_) {
+	    	        AttendanceVo savedAtt = attendanceMap_.get(student.getStudent_id());
+	    	        if (savedAtt != null) {
+	    	            if (attendanceStatusFilter_ == null || attendanceStatusFilter_.trim().equals("")) {
+	    	                updateTargetList.add(student);
+	    	            } else if (attendanceStatusFilter_.equals(savedAtt.getStatus())) {
+	    	                updateTargetList.add(student);
+	    	            }
+	    	        }
+	    	    }
+
+	    	    request.setAttribute("professorCourseList", professorCourseList_);
+	    	    request.setAttribute("studentList", updateTargetList);
+	    	    request.setAttribute("attendanceMap", attendanceMap_);
+	    	    request.setAttribute("selectedCourseId", courseId_);
+	    	    request.setAttribute("classDate", class_DateStr);
+	    	    request.setAttribute("studentNameKeyword", studentNameKeyword_);
+	    	    request.setAttribute("attendanceStatusFilter", attendanceStatusFilter_);
+
+	    	    classroomCenter = "/view_classroom/attendance/attendanceProfessorUpdate.jsp";
+	    	    request.setAttribute("classroomCenter", classroomCenter);
+
+	    	    nextPage = "/view_classroom/classroom.jsp";
+	    	    break;	    		
 
 	    	default:
 	    		break;

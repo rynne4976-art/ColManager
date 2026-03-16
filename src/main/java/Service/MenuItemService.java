@@ -59,8 +59,7 @@ public class MenuItemService {
             new MenuItemVo("논문 검색", "/scholar/main.do"),
             new MenuItemVo("취업박람회", "/jobfair/main.do"),
             new MenuItemVo("중고책방", "/Book/bookpostboard.bo?center=/view_student/booktradingboard.jsp"),
-            new MenuItemVo("중고서점 찾아보기", "/Board/bookShopMap.bo"),
-            new MenuItemVo("채팅", "/member/chat.bo")
+            new MenuItemVo("중고서점 찾아보기", "/Board/bookShopMap.bo")
         ));
 
         // 교수 메뉴

@@ -1,36 +1,57 @@
 package Controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Properties;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONObject;
 
-import webSocket.ChatServer;
+import Service.ChatbotService;
 
 @WebServlet("/chatbot/*")
 public class ChatBotController extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private String apiKey;
     private String appUrl;
-    private ChatServer chatServer;
+    private ChatbotService chatbotService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        apiKey = config.getServletContext().getInitParameter("openrouterApiKey");
-        appUrl = config.getServletContext().getInitParameter("appUrl");
-        if (appUrl == null || appUrl.trim().isEmpty()) {
-            appUrl = "http://localhost:8090/ColManager_1";
+
+        try {
+            Properties prop = new Properties();
+            InputStream is = getClass().getClassLoader().getResourceAsStream("config.properties");
+
+            if (is == null) {
+                throw new ServletException("config.properties 파일을 찾을 수 없습니다.");
+            }
+
+            prop.load(is);
+
+            apiKey = prop.getProperty("openrouter.apiKey");
+            appUrl = prop.getProperty("app.url");
+
+            if (appUrl == null || appUrl.trim().isEmpty()) {
+                appUrl = "http://localhost:8090/ColManager";
+            }
+
+            chatbotService = new ChatbotService(apiKey, appUrl);
+
+        } catch (Exception e) {
+            throw new ServletException("ChatBotController 초기화 중 오류가 발생했습니다.", e);
         }
-        chatServer = new ChatServer();
     }
 
     @Override
@@ -45,16 +66,17 @@ public class ChatBotController extends HttpServlet {
         doHandle(request, response);
     }
 
-    protected void doHandle(HttpServletRequest request, HttpServletResponse response)
+    @SuppressWarnings("unchecked")
+    private void doHandle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         String action = request.getPathInfo();
 
-        if (action == null || "/page.do".equals(action)) {
-            request.setAttribute("center", "/common/AIService.jsp");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/main.jsp");
-            dispatcher.forward(request, response);
+        if (action == null || "/".equals(action) || "/page.do".equals(action)) {
+            response.sendRedirect(request.getContextPath() + "/main.bo");
             return;
         }
 
@@ -65,14 +87,25 @@ public class ChatBotController extends HttpServlet {
 
             try {
                 String message = request.getParameter("message");
-                if (message == null || message.trim().isEmpty()) {
-                    json.put("status", "fail");
-                    json.put("reply", "질문을 입력해주세요.");
-                } else {
-                    String reply = chatServer.ask(apiKey, appUrl, message);
-                    json.put("status", "success");
-                    json.put("reply", reply);
+
+                HttpSession session = request.getSession(false);
+                String loginId = null;
+                String role = null;
+                String studentId = null;
+                String professorId = null;
+
+                if (session != null) {
+                    loginId = (String) session.getAttribute("id");
+                    role = (String) session.getAttribute("role");
+                    studentId = (String) session.getAttribute("student_id");
+                    professorId = (String) session.getAttribute("professor_id");
                 }
+
+                String reply = chatbotService.getReply(message, loginId, role, studentId, professorId);
+
+                json.put("status", "success");
+                json.put("reply", reply);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 json.put("status", "fail");

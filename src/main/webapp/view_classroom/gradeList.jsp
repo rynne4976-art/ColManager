@@ -18,15 +18,13 @@
         rel="stylesheet" crossorigin="anonymous">
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <style>
-        .btn-green {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .btn-green:hover {
-            background-color: #45a049;
-        }
-
+        .btn-green { background-color: #4CAF50; color: white; }
+        .btn-green:hover { background-color: #45a049; }
+        .g-Ap, .g-A0 { color: #0d6efd; font-weight: 700; }
+        .g-Bp, .g-B0 { color: #198754; font-weight: 700; }
+        .g-Cp, .g-C0 { color: #fd7e14; font-weight: 700; }
+        .g-Dp, .g-D0 { color: #dc3545; font-weight: 700; }
+        .g-F          { color: #6c757d; font-weight: 700; }
     </style>
 </head>
 <body class="bg-light">
@@ -98,6 +96,7 @@
                             <th scope="col">과 제</th>
                             <th scope="col">총 점</th>
                             <th scope="col">등 급</th>
+                            <th scope="col">학점(4.5)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -114,52 +113,64 @@
                             <td><%=student.getAssignment_score()%></td>
                             <td class="total"><%=student.getScore()%></td>
                             <td class="grade"></td>
+                            <td class="gpa"></td>
                         </tr>
                         <%
                         }
                         %>
                     </tbody>
+                    <tfoot id="gpa-summary" style="display:none;">
+                        <tr class="table-secondary">
+                            <td colspan="9" class="text-end fw-bold">평균 학점 (4.5 만점)</td>
+                            <td id="avg-gpa" class="fw-bold text-primary fs-6">-</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
     </main>
-	<script type="text/javascript">
-	// 페이지 로드 시 실행되는 함수
-    window.onload = function() {
-        calculateGrades(); // 등급 계산 함수 호출
-    };
-
-    function calculateGrades() {
-        // 모든 테이블 행 가져오기
-        const rows = document.querySelectorAll("tbody tr");
-        
-        // 각 행을 반복 처리
-        rows.forEach(row => {
-            // 해당 행의 총점 (total)과 등급 (grade) 가져오기
-            const totalElement = row.querySelector(".total");
-            const gradeElement = row.querySelector(".grade");
-            
-            // 총점 값을 가져오고 숫자로 변환
-            const totalValue = parseFloat(totalElement.textContent);
-            
-            // 등급 계산
-            let grade = "";
-            if (totalValue >= 90) {
-                grade = "A";
-            } else if (totalValue >= 80) {
-                grade = "B";
-            } else if (totalValue >= 70) {
-                grade = "C";
-            } else if (totalValue >= 60) {
-                grade = "D";
-            } else {
-                grade = "F";
-            }
-            
-            // 계산된 등급을 grade 태그에 설정
-            gradeElement.textContent = grade;
-        });
+    <script type="text/javascript">
+    /* 점수 → 등급·학점 변환 (4.5 만점) */
+    function getGradeInfo(score) {
+        if (score >= 95) return { grade: "A+", cls: "g-Ap", gpa: 4.5 };
+        if (score >= 90) return { grade: "A0", cls: "g-A0", gpa: 4.0 };
+        if (score >= 85) return { grade: "B+", cls: "g-Bp", gpa: 3.5 };
+        if (score >= 80) return { grade: "B0", cls: "g-B0", gpa: 3.0 };
+        if (score >= 75) return { grade: "C+", cls: "g-Cp", gpa: 2.5 };
+        if (score >= 70) return { grade: "C0", cls: "g-C0", gpa: 2.0 };
+        if (score >= 65) return { grade: "D+", cls: "g-Dp", gpa: 1.5 };
+        if (score >= 60) return { grade: "D0", cls: "g-D0", gpa: 1.0 };
+        return { grade: "F", cls: "g-F", gpa: 0.0 };
     }
-	</script>
+
+    window.onload = function() {
+        const rows = document.querySelectorAll("tbody tr");
+        let totalGpa = 0, count = 0;
+
+        rows.forEach(row => {
+            const totalEl = row.querySelector(".total");
+            const gradeEl = row.querySelector(".grade");
+            const gpaEl   = row.querySelector(".gpa");
+            if (!totalEl || !gradeEl || !gpaEl) return;
+
+            const score = parseFloat(totalEl.textContent);
+            const info  = getGradeInfo(score);
+
+            gradeEl.textContent = info.grade;
+            gradeEl.className   = "grade " + info.cls;
+            gpaEl.textContent   = info.gpa.toFixed(1);
+            gpaEl.className     = "gpa " + info.cls;
+
+            totalGpa += info.gpa;
+            count++;
+        });
+
+        if (count > 0) {
+            const avg = (totalGpa / count).toFixed(2);
+            document.getElementById("avg-gpa").textContent = avg + " / 4.5";
+            document.getElementById("gpa-summary").style.display = "";
+        }
+    };
+    </script>
 </body>
 </html>

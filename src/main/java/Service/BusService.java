@@ -1,164 +1,96 @@
 package Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.sql.*;
+import java.util.*;
 
 public class BusService {
 
-    // 공공데이터 API
-    private static final String SERVICE_KEY = "b48401cf98b243db75c7cef7d1948f3b684ace34b5adddefb9e5bd1c65665482";
+    private Connection getConnection() throws Exception {
+        Class.forName("com.mysql.cj.jdbc.Driver");
 
-    private static final String API_URL =
-            "https://api.odcloud.kr/api/3079310/v1/uddi:4eccd3ef-d4ab-4706-bbb9-dad3edd62833_201905271750";
-
-
-    // 1️⃣ API 호출
-    private String callAPI(){
-
-        StringBuilder result = new StringBuilder();
-
-        try{
-
-            String requestURL =
-                    API_URL +
-                    "?page=1" +
-                    "&perPage=50" +
-                    "&serviceKey=" + SERVICE_KEY;
-
-            URL url = new URL(requestURL);
-
-            HttpURLConnection conn =
-                    (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("GET");
-
-            BufferedReader rd;
-
-            if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300){
-
-                rd = new BufferedReader(
-                        new InputStreamReader(conn.getInputStream()));
-
-            }else{
-
-                rd = new BufferedReader(
-                        new InputStreamReader(conn.getErrorStream()));
-            }
-
-            String line;
-
-            while((line = rd.readLine()) != null){
-
-                result.append(line);
-            }
-
-            rd.close();
-            conn.disconnect();
-
-        }catch(Exception e){
-
-            e.printStackTrace();
-        }
-
-        return result.toString();
+        return DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/colbus?serverTimezone=Asia/Seoul",
+                "root",
+                "0000"
+        );
     }
 
+    /* 버스 시간표 */
+    public List<Map<String, String>> getSchedule() {
 
-    // 2️⃣ API JSON 파싱 → 버스 노선 리스트 생성
-    private List<String> getRoutes(){
+        List<Map<String, String>> list = new ArrayList<>();
 
-        List<String> routes = new ArrayList<>();
+        try {
+            Connection conn = getConnection();
 
-        try{
+            String sql = "SELECT start_building, end_building, bus_number, travel_time FROM route ORDER BY travel_time";
 
-            String apiData = callAPI();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-            JSONObject json = new JSONObject(apiData);
+            while (rs.next()) {
 
-            JSONArray data = json.getJSONArray("data");
+                String time = rs.getString("travel_time").substring(0, 5);
 
-            for(int i=0;i<data.length();i++){
+                String[] t = time.split(":");
+                int h = Integer.parseInt(t[0]);
+                int m = Integer.parseInt(t[1]);
 
-                JSONObject bus = data.getJSONObject(i);
-
-                String route = bus.getString("노선번호");
-
-                if(!routes.contains(route)){ // 중복 제거
-
-                    routes.add(route);
+                // 이동시간 10분 추가
+                m += 10;
+                if (m >= 60) {
+                    h++;
+                    m -= 60;
                 }
+
+                String arrive = String.format("%02d:%02d", h, m);
+
+                Map<String, String> map = new HashMap<>();
+                map.put("route", rs.getString("bus_number"));
+                map.put("time", time);
+                map.put("start", rs.getString("start_building"));
+                map.put("end", rs.getString("end_building"));
+                map.put("arrive", arrive);
+
+                list.add(map);
             }
 
-        }catch(Exception e){
+            rs.close();
+            ps.close();
+            conn.close();
 
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return routes;
+        return list;
     }
 
+    /* 건물 목록 */
+    public List<String> getBuildings() {
 
-    // 3️⃣ 가상 시간표 생성
-    public List<String[]> getSchedule(){
+        List<String> list = new ArrayList<>();
 
-        List<String[]> schedule = new ArrayList<>();
+        try {
+            Connection conn = getConnection();
 
-        List<String> routes = getRoutes();
+            String sql = "SELECT name FROM building";
 
-        LocalTime start = LocalTime.of(8,0);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-        for(String route : routes){
-
-            LocalTime time = start;
-
-            for(int i=0;i<10;i++){
-
-                schedule.add(new String[]{
-                        time.toString(),
-                        route
-                });
-
-                time = time.plusMinutes(20);
+            while (rs.next()) {
+                list.add(rs.getString("name"));
             }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return schedule;
-    }
-
-
-    // 4️⃣ 추천 버스 계산
-    public String[] recommendBus(){
-
-        List<String[]> schedule = getSchedule();
-
-        LocalTime now = LocalTime.now();
-
-        for(String[] bus : schedule){
-
-            LocalTime busTime = LocalTime.parse(bus[0]);
-
-            if(busTime.isAfter(now)){
-
-                long remain =
-                        Duration.between(now,busTime).toMinutes();
-
-                return new String[]{
-                        bus[0], // 시간
-                        bus[1], // 노선
-                        String.valueOf(remain)
-                };
-            }
-        }
-
-        return new String[]{"없음","없음","0"};
+        return list;
     }
 }

@@ -59,22 +59,27 @@
 				style="position: absolute; left: 50%; transform: translateX(-50%);">
 				<i class="fas fa-graduation-cap"></i> 학사 지원 프로그램
 			</a>
-			<!-- 환영 메시지와 로그아웃 버튼: 로그인된 경우에만 표시 -->
-			<div class="navbar-text ms-auto">
-				<%
-					if (userRole != null) {
-				%>
-				반갑습니다. &nbsp;&nbsp;<b><%=userName%></b>
-				<%=userRole%>님!&nbsp;&nbsp;
-				<button type="button" class="btn btn-primary"
-					onclick="location.href='<%=contextPath%>/member/logout.me'">로그아웃</button>
-				<%
-					} else {
-				%>
-				로그인을 진행해주세요.
-				<%
-					}
-				%>
+			<!-- 언어 선택 + 환영 메시지 + 로그아웃 -->
+			<div class="d-flex align-items-center ms-auto gap-3">
+
+				<!-- 환영 메시지와 로그아웃 버튼: 로그인된 경우에만 표시 -->
+				<div class="navbar-text">
+					<%
+						if (userRole != null) {
+					%>
+					반갑습니다. &nbsp;&nbsp;<b><%=userName%></b>
+					<%=userRole%>님!&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary"
+						onclick="location.href='<%=contextPath%>/member/logout.me'">로그아웃</button>
+					<%
+						} else {
+					%>
+					로그인을 진행해주세요.
+					<%
+						}
+					%>
+				</div>
+
 			</div>
 		</div>
 
@@ -110,6 +115,66 @@
 	<%
 		}
 	%>
+
+	<!-- Google Translate 요소 (숨김) -->
+	<div id="google_translate_element" style="display:none"></div>
+
+	<script>
+	/* ── Google Translate 배너 강제 제거 ── */
+	function hideBanner() {
+	    var banner = document.querySelector('.goog-te-banner-frame');
+	    if (banner) banner.style.setProperty('display', 'none', 'important');
+	    document.body.style.setProperty('top', '0px', 'important');
+	}
+
+	/* 배너가 DOM에 추가될 때마다 즉시 제거 */
+	var _bannerObserver = new MutationObserver(function() { hideBanner(); });
+	_bannerObserver.observe(document.documentElement, { childList: true, subtree: true });
+
+	/* ── Google Translate 초기화 ── */
+	function googleTranslateElementInit() {
+	    new google.translate.TranslateElement({
+	        pageLanguage: 'ko',
+	        includedLanguages: 'en,zh-CN,ja,es',
+	        autoDisplay: false
+	    }, 'google_translate_element');
+	    hideBanner();
+	}
+
+	/* ── 언어 변경 ── */
+	function changeLanguage(lang) {
+	    if (lang === 'ko') {
+	        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+	        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.' + location.hostname + '; path=/;';
+	        location.reload();
+	        return;
+	    }
+	    var select = document.querySelector('.goog-te-combo');
+	    if (select) {
+	        select.value = lang;
+	        select.dispatchEvent(new Event('change'));
+	        document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+	        var activeBtn = document.querySelector('.lang-btn[data-lang="' + lang + '"]');
+	        if (activeBtn) activeBtn.classList.add('active');
+	    } else {
+	        document.cookie = 'googtrans=/ko/' + lang + '; path=/;';
+	        document.cookie = 'googtrans=/ko/' + lang + '; domain=.' + location.hostname + '; path=/;';
+	        location.reload();
+	    }
+	}
+
+	/* ── 페이지 로드 시 현재 언어 버튼 활성화 ── */
+	(function () {
+	    var match = document.cookie.match(/googtrans=\/ko\/([^;]+)/);
+	    var currentLang = match ? match[1] : 'ko';
+	    document.querySelectorAll('.lang-btn').forEach(function (btn) {
+	        if (btn.getAttribute('data-lang') === currentLang) {
+	            btn.classList.add('active');
+	        }
+	    });
+	})();
+	</script>
+	<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 	<!-- Font Awesome and Bootstrap JS -->
 	<script

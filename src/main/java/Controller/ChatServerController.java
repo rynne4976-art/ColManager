@@ -1,103 +1,149 @@
 package Controller;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.EndpointConfig;
+import javax.websocket.HandshakeResponse;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpoint;
+import javax.websocket.server.ServerEndpointConfig;
 
-import utils.SessionUtil;
+import com.google.gson.JsonObject;
 
-//@ServerEndpoint 에너테이션으로 웹 소켓 서버의 요청명을 지정하여, 
-//해당 요청명으로 접속하는 클라이언트를
-//이 서블릿 서버페이지가 처리하게 합니다.
-
-//요청 주소명이 /ChatingServer이므로 이 웹소켓에 접속하기 위한 전체 URL은 다음과 같습니다.
-//->  ws://호스트:포트번호/컨텍스트루트/ChatingServer
-
-//참고 - 웹 소켓은 http프로토콜이 아닌 ws프로트콜을 사용합니다.
-
-@ServerEndpoint("/ChatingServer")
+/**
+ * WebSocket 채팅 서버 엔드포인트.
+ * 경로: /chat  (ws://host/ColManager/chat)
+ *
+ * - Configurator 내부 클래스: HTTP 세션 → WebSocket 세션 전달 (구 ChatConfigurator)
+ * - ChatServerController 본체: 접속·메시지·퇴장 처리 및 JSON 브로드캐스트 (구 ChatController)
+ */
+@ServerEndpoint(value = "/chat", configurator = ChatServerController.Configurator.class)
 public class ChatServerController {
-	
-	//현재 연결된 클라이언 세션영역을 저장하는 Set.
-	private static Set<Session> clients = 
-			Collections.synchronizedSet(new HashSet<Session>());
-	
-		
-	
-	//클라이언트가 접속할때 자동으로 호출되는 메서드 정의
-	 @OnOpen
-	    public void onOpen(Session session) throws IOException {
-	  
-	        clients.add(session);
-	        System.out.println("웹 소켓 연결:" + session.getId() + " 사용자: " + SessionUtil.name);
 
-	        // 사용자 입장 메시지 전송
-	   broadcastMessage("System", SessionUtil.name + "님이 들어오셨습니다.");
-	    }
-	
-	//클라이언트로 부터 메세지를 받았을때 자동으로 호출되는 메서드 정의 
-	@OnMessage
-	public void onMessage(String message, Session session) 
-							throws IOException {
-		System.out.println("메세지 전송 : " +  session.getId() + " : " + message);
-		
-		//동기화된 client Set에 대해 모든 클라이언트에게 메세지 전송
-		synchronized (clients) {
-			
-			for(Session client  : clients) {
-				//메세지를 보낸 클라이언트는 제외하고 다른 클라이언트 창 화면에 메세지 전송
-				if(!client.equals(session)) {
-					client.getBasicRemote().sendText(message);//메세지 전송
-				}
-			}
-		}
-	}
-	
-	//클라이언트와의 연결이 종료되었을때 자동으로 호출되는 메서드 
-	@OnClose
-	public void onClose(Session session) throws IOException {
-		//연결이 종료된 클라이언트의 세션영역을 Set에서 제거
-		clients.remove(session);
-		System.out.println("웹소켓 종료 : " + SessionUtil.name);//종료 로그 출력
-		// 사용자 퇴장을 알리는 메시지를 다른 클라이언트에게 전송
-        broadcastMessage("System", SessionUtil.name + "님이 퇴장하셨습니다.");
-	}
-	
-	//에러가 발생했을때 자동으로 호출되는 메서드
-	@OnError
-	public void OnError(Throwable e) {
-		System.out.println("에러 발생"); //에러 발생 로그 출력
-		e.printStackTrace();//에러 스택 추적을 콘솔에 출력
-	}
-	
-	
-	// 모든 클라이언트에게 메시지를 전송하는 메서드
-    private void broadcastMessage(String sender, String message) throws IOException {
-        synchronized (clients) {
-            for (Session client : clients) {
-                client.getBasicRemote().sendText(sender + " | " + message);
+    // ──────────────────────────────────────────────
+    // 내부 Configurator (구 ChatConfigurator 흡수)
+    // HTTP 핸드셰이크 시 HttpSession을 WebSocket UserProperties에 전달
+    // ──────────────────────────────────────────────
+    public static class Configurator extends ServerEndpointConfig.Configurator {
+        @Override
+        public void modifyHandshake(ServerEndpointConfig config,
+                                    HandshakeRequest request,
+                                    HandshakeResponse response) {
+            HttpSession httpSession = (HttpSession) request.getHttpSession();
+            if (httpSession != null) {
+                config.getUserProperties().put("httpSession", httpSession);
             }
         }
-    }    
+    }
+
+    // ──────────────────────────────────────────────
+    // 연결된 클라이언트 세션 → [이름, 역할]
+    // ──────────────────────────────────────────────
+    private static final Map<Session, String[]> clients =
+            Collections.synchronizedMap(new LinkedHashMap<>());
+
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HH:mm");
+
+    // ──────────────────────────────────────────────
+    // 1. 클라이언트 접속
+    // ──────────────────────────────────────────────
+    @OnOpen
+    public void onOpen(Session session, EndpointConfig config) {
+
+        HttpSession httpSession =
+                (HttpSession) config.getUserProperties().get("httpSession");
+
+        String name = "익명";
+        String role = "";
+
+        if (httpSession != null) {
+            String n = (String) httpSession.getAttribute("name");
+            String r = (String) httpSession.getAttribute("role");
+            if (n != null) name = n;
+            if (r != null) role = r;
+        }
+
+        clients.put(session, new String[]{name, role});
+        System.out.println("[Chat] 접속: " + name + "(" + role + ") / 현재 " + clients.size() + "명");
+
+        broadcast(buildMessage("join", "시스템", "", name + "님이 입장했습니다."));
+    }
+
+    // ──────────────────────────────────────────────
+    // 2. 메시지 수신 → 전체 브로드캐스트
+    // ──────────────────────────────────────────────
+    @OnMessage
+    public void onMessage(String message, Session sender) {
+
+        String[] info = clients.get(sender);
+        String name = info != null ? info[0] : "익명";
+        String role = info != null ? info[1] : "";
+        System.out.println("[Chat] [" + name + "]: " + message);
+
+        broadcast(buildMessage("message", name, role, message));
+    }
+
+    // ──────────────────────────────────────────────
+    // 3. 클라이언트 퇴장
+    // ──────────────────────────────────────────────
+    @OnClose
+    public void onClose(Session session) {
+        String[] info = clients.remove(session);
+        String name = info != null ? info[0] : "익명";
+        System.out.println("[Chat] 퇴장: " + name + " / 현재 " + clients.size() + "명");
+
+        broadcast(buildMessage("leave", "시스템", "", name + "님이 퇴장했습니다."));
+    }
+
+    // ──────────────────────────────────────────────
+    // 4. 오류 처리
+    // ──────────────────────────────────────────────
+    @OnError
+    public void onError(Session session, Throwable t) {
+        System.err.println("[Chat] 오류: " + t.getMessage());
+        clients.remove(session);
+    }
+
+    // ──────────────────────────────────────────────
+    // 내부 유틸 메서드
+    // ──────────────────────────────────────────────
+
+    /** 연결된 모든 클라이언트에게 JSON 메시지를 전송한다. */
+    private void broadcast(String jsonMsg) {
+        synchronized (clients) {
+            for (Session s : clients.keySet()) {
+                if (s.isOpen()) {
+                    try {
+                        s.getBasicRemote().sendText(jsonMsg);
+                    } catch (IOException e) {
+                        System.err.println("[Chat] 전송 오류: " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    /** 전송할 JSON 문자열을 빌드한다. */
+    private String buildMessage(String type, String sender, String role, String content) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("type",      type);
+        obj.addProperty("sender",    sender);
+        obj.addProperty("role",      role);
+        obj.addProperty("content",   content);
+        obj.addProperty("time",      LocalTime.now().format(TIME_FMT));
+        obj.addProperty("userCount", clients.size());
+        return obj.toString();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-

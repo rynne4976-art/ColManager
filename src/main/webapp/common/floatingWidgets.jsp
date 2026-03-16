@@ -60,8 +60,7 @@
         <div class="float-ai-msgs" id="floatAiMsgs">
             <div class="float-row bot">
             	<div class="float-bubble">
-안녕하세요! 학사 지원 프로그램 AI 도우미입니다.
-수강신청, 성적조회, 공지사항, 메뉴 이용 방법 등을 질문해보세요.
+안녕하세요! 학사 지원 프로그램 AI 도우미입니다. 학사와 관련된 궁금한 내용을 질문해주세요.
             	</div>
             </div>
         </div>
@@ -70,6 +69,7 @@
             <button type="button" data-q="수강신청은 어떻게 하나요?">수강신청</button>
             <button type="button" data-q="성적조회는 어디에서 하나요?">성적조회</button>
             <button type="button" data-q="공지사항은 어디에서 확인하나요?">공지사항</button>
+            <button type="button" data-q="출결상황 확인해주세요">출결확인</button>
         </div>
 
         <form class="float-ai-input" id="floatAiForm">

@@ -23,7 +23,7 @@ String name = (String) session.getAttribute("name");
 	href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css"
 	rel="stylesheet" />
 <link href="<%=contextPath%>/css/classroom_styles.css" rel="stylesheet" />
-<link href="<%=contextPath%>/css/email.css" rel="stylesheet" />
+<link href="<%=contextPath%>/css/widget.css" rel="stylesheet" />
 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- jQuery 추가 -->
@@ -221,6 +221,14 @@ String name = (String) session.getAttribute("name");
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-tachometer-alt"></i>
 							</div> 수강신청
+						</a>
+						
+						<div class="sb-sidenav-menu-heading">schedule</div>
+						<a class="nav-link"
+							href="<%=contextPath%>/classroom/studentTimetable.bo">
+							<div class="sb-nav-link-icon">
+								<i class="fas fa-tachometer-alt"></i>
+							</div> 주간 시간표
 						</a>
 
 						<!-- 사이드바 나의 수업 영역 -->

@@ -53,7 +53,7 @@ if (!isLogin || myName == null || myName.isEmpty()) {
 <% } else { %>
 
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="chat-embed-html">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,7 +63,7 @@ if (!isLogin || myName == null || myName.isEmpty()) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="<%=contextPath%>/css/widget.css">
 </head>
-<body>
+<body class="chat-embed-body">
 
 	<div class="chat-wrapper">
 		<div class="chat-messages" id="chatMessages"></div>

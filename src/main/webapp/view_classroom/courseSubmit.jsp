@@ -69,6 +69,7 @@
                             <th scope="col">과목 이름</th>
                             <th scope="col">교수명</th>
                             <th scope="col">강의실</th>
+                            <th scope="col">시간</th>
                             <th scope="col">수 강</th>
                         </tr>
                     </thead>
@@ -79,6 +80,7 @@
                             <td><%=course.getCourse_name()%></td>
                             <td><%=course.getProfessor_name().getUser_name()%></td>
                             <td><%=course.getRoom_id()%></td>
+                            <td><%=course.getTimetable_info()%></td>
                             <td>
                                 <% if (isEnrollmentPeriod) { %>
                                     <button class="btn btn-green register-btn" onclick="moveToApply(this)">수강</button>
@@ -105,6 +107,7 @@
                             <th scope="col">과목 이름</th>
                             <th scope="col">교수명</th>
                             <th scope="col">강의실</th>
+                            <th scope="col">시간</th>
                             <th scope="col">취 소</th>
                         </tr>
                     </thead>
@@ -115,6 +118,7 @@
                             <td><%=course1.getCourse_name()%></td>
                             <td><%=course1.getProfessor_name().getUser_name()%></td>
                             <td><%=course1.getRoom_id()%></td>
+                            <td><%=course1.getTimetable_info()%></td>
                             <td>
                                 <% if (isEnrollmentPeriod) { %>
                                     <button class="btn btn-danger cancel-btn" onclick="moveToCourse(this)">취소</button>
@@ -136,48 +140,66 @@
         </div>
     </main>
     <script type="text/javascript">
-        function moveToApply(button) {
-            const row = button.closest("tr");
-            const courseId = row.cells[0].innerText;
-            document.getElementById("applyTableBody").appendChild(row);
-            button.textContent = "취소";
-            button.className = "btn btn-danger cancel-btn";
-            button.setAttribute("onclick", "moveToCourse(this)");
-            sendDataToController(courseId, "courseInsert.do");
-        }
-
-        function moveToCourse(button) {
-            const row = button.closest("tr");
-            const courseId = row.cells[0].innerText;
-            document.getElementById("courseTableBody").appendChild(row);
-            button.textContent = "수강";
-            button.className = "btn btn-green register-btn";
-            button.setAttribute("onclick", "moveToApply(this)");
-            sendDataToController(courseId, "courseDelete.do");
-        }
-
-        function sendDataToController(courseId, action) {
-            var url = "<%=contextPath%>/classroom/" + action + "?classroomCenter=/view_classroom/courseSubmit.jsp";
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: {
-                    courseId: courseId
-                },
-                success: function (response) {
-                    if (response === "Success") {
-                        alert("성공!");
-                    } else {
-                        alert("실패!");
-                    }
-                },
-            });
-        }
-
-        function finishEnrollment() {
-            alert("수강신청이 종료되었습니다!");
-            window.location.href = "<%=contextPath%>/classroom/allAssignNotice.do";
-        }
+	    function moveToApply(button) {
+	        const row = button.closest("tr");
+	        const courseId = row.cells[0].innerText;
+	
+	        sendDataToController(courseId, "courseInsert.do", function(response) {
+	            if (response === "Success") {
+	                document.getElementById("applyTableBody").appendChild(row);
+	                button.textContent = "취소";
+	                button.className = "btn btn-danger cancel-btn";
+	                button.setAttribute("onclick", "moveToCourse(this)");
+	                alert("수강신청이 완료되었습니다.");
+	            } else if (response === "TimeConflict") {
+	                alert("이미 같은 시간대에 신청한 과목이 있습니다.");
+	            } else if (response === "AlreadyEnrolled") {
+	                alert("이미 신청한 과목입니다.");
+	            } else {
+	                alert("수강신청에 실패했습니다.");
+	            }
+	        });
+	    }
+	
+	    function moveToCourse(button) {
+	        const row = button.closest("tr");
+	        const courseId = row.cells[0].innerText;
+	
+	        sendDataToController(courseId, "courseDelete.do", function(response) {
+	            if (response === "Success") {
+	                document.getElementById("courseTableBody").appendChild(row);
+	                button.textContent = "수강";
+	                button.className = "btn btn-green register-btn";
+	                button.setAttribute("onclick", "moveToApply(this)");
+	                alert("수강취소가 완료되었습니다.");
+	            } else {
+	                alert("수강취소에 실패했습니다.");
+	            }
+	        });
+	    }
+	
+	    function sendDataToController(courseId, action, callback) {
+	        var url = "<%=contextPath%>/classroom/" + action + "?classroomCenter=/view_classroom/courseSubmit.jsp";
+	
+	        $.ajax({
+	            url: url,
+	            type: "POST",
+	            data: {
+	                courseId: courseId
+	            },
+	            success: function(response) {
+	                callback(response);
+	            },
+	            error: function() {
+	                alert("서버 요청 중 오류가 발생했습니다.");
+	            }
+	        });
+	    }
+	
+	    function finishEnrollment() {
+	        alert("수강신청이 종료되었습니다!");
+	        window.location.href = "<%=contextPath%>/classroom/allAssignNotice.do";
+	    }
     </script>
 </body>
 </html>

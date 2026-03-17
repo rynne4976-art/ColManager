@@ -757,28 +757,36 @@ public class ClassroomController extends HttpServlet {
 	    	    out.close();
 	    	    return;
 	    	    
-		//==========================================================================================
+		//========================================================================================== 
 		        
-	    	case "/courseInsert.do": //수강 신청
-	    		
+	    	case "/courseInsert.do": // 수강 신청
+
 	    		String courseId = request.getParameter("courseId");
-	    		studentId = (String)session.getAttribute("student_id");
+	    		studentId = (String) session.getAttribute("student_id");
+
 	    		System.out.println(courseId);
 	    		System.out.println(studentId);
-	    		int isInsert = classroomservice.serviceCourseInsert(courseId, studentId);
-	    		
+
+	    		String insertResult = classroomservice.serviceCourseInsertWithCheck(courseId, studentId);
+
 	    		nextPage = "/view_classroom/classroom.jsp";
-	    		
-	    		if(isInsert > 0) {
+
+	    		if ("SUCCESS".equals(insertResult)) {
 	    			response.getWriter().write("Success");
 	    			return;
-	    		}else {
+	    		} else if ("TIME_CONFLICT".equals(insertResult)) {
+	    			response.getWriter().write("TimeConflict");
+	    			return;
+	    		} else if ("ALREADY_ENROLLED".equals(insertResult)) {
+	    			response.getWriter().write("AlreadyEnrolled");
+	    			return;
+	    		} else {
 	    			response.getWriter().write("Fail");
 	    			return;
 	    		}
 	    		
 		        
-	    //==========================================================================================
+	    //========================================================================================== 
 	    		
 	    	case "/courseDelete.do": //수강 취소
 	    		
@@ -1342,6 +1350,83 @@ public class ClassroomController extends HttpServlet {
 	    	    nextPage = "/view_classroom/classroom.jsp";
 	    	    break;	    		
 
+	    	    
+	    //==========================================================================================	시간표용  
+	    		
+	    	case "/studentTimetableData.do":
+
+	    	    String timetableStudentId = (String) session.getAttribute("student_id");
+	    	    JSONArray timetableArray = new JSONArray();
+
+	    	    response.setContentType("application/json; charset=UTF-8");
+	    	    out = response.getWriter();
+
+	    	    if (timetableStudentId != null && !timetableStudentId.trim().equals("")) {
+
+	    	    	Map<String, Map<String, String>> timetableMap =
+	    	    			classroomservice.serviceGetStudentTimetable(timetableStudentId);
+
+	    	    	for (Map.Entry<String, Map<String, String>> entry : timetableMap.entrySet()) {
+
+	    	    		Map<String, String> cell = entry.getValue();
+
+	    	    		JSONObject obj = new JSONObject();
+	    	    		obj.put("key", entry.getKey()); // 예: 월_1
+	    	    		obj.put("day", convertDayToEng(cell.get("day_of_week")));
+	    	    		obj.put("period", cell.get("period_no"));
+	    	    		obj.put("courseId", cell.get("course_id"));
+	    	    		obj.put("subject", cell.get("course_name"));
+	    	    		obj.put("room", cell.get("room_id"));
+	    	    		obj.put("professor", cell.get("professor_name"));
+
+	    	    		timetableArray.add(obj);
+	    	    	}
+	    	    }
+
+	    	    System.out.println("student_id = " + session.getAttribute("student_id"));
+
+	    	    out.print(timetableArray.toJSONString());
+	    	    out.flush();
+	    	    out.close();
+	    	    return;
+	    	    
+	    	case "/studentTimetableMiniData.do":
+
+	    	    String miniStudentId = (String) session.getAttribute("student_id");
+	    	    JSONArray miniArray = new JSONArray();
+
+	    	    response.setContentType("application/json; charset=UTF-8");
+	    	    out = response.getWriter();
+
+	    	    if (miniStudentId != null && !miniStudentId.trim().equals("")) {
+
+	    	    	List<Map<String, String>> miniList =
+	    	    			classroomservice.serviceGetStudentTimetableMini(miniStudentId);
+
+	    	    	for (Map<String, String> row : miniList) {
+	    	    		JSONObject obj = new JSONObject();
+	    	    		obj.put("subject", row.get("course_name"));
+	    	    		obj.put("day", convertDayToEng(row.get("day_of_week")));
+	    	    		obj.put("period", row.get("period_no"));
+	    	    		obj.put("room", row.get("room_id"));
+	    	    		miniArray.add(obj);
+	    	    	}
+	    	    }
+
+	    	    out.print(miniArray.toJSONString());
+	    	    out.flush();
+	    	    out.close();
+	    	    return;
+	    		
+	    	case "/studentTimetable.bo": // 학생 시간표 화면 이동
+
+	    	    request.setAttribute("classroomCenter", "/view_classroom/studentTimetable.jsp");
+
+	    	    nextPage = "/view_classroom/classroom.jsp";
+
+	    	    break;    
+	    	    
+	    	    
 	    	default:
 	    		break;
 	    }
@@ -1356,5 +1441,14 @@ public class ClassroomController extends HttpServlet {
 		dispatch.forward(request, response);
 		
 	} // doHandle 메소드
+	
+	private String convertDayToEng(String day) {
+		if ("월".equals(day)) return "MON";
+		if ("화".equals(day)) return "TUE";
+		if ("수".equals(day)) return "WED";
+		if ("목".equals(day)) return "THU";
+		if ("금".equals(day)) return "FRI";
+		return day;
+	}
 
 }

@@ -127,21 +127,30 @@
     //-------------
  	// 수정 버튼 클릭 시
 	$(document).on('click', '.edit-btn', function () {
-	    var row = $(this).closest('tr'); // 현재 행 가져오기
+	    var row = $(this).closest('tr');
 	
-	    // 기존 값 저장 (data 속성에 저장)
 	    row.find('.editable').each(function () {
 	        var cell = $(this);
-	        cell.data('original-value', cell.text()); // 기존 값을 저장
+	        cell.data('original-value', cell.text());
 	        var value = cell.text();
 	
-	        // 시작 날짜와 마감 날짜는 date picker 두 개로 변환
 	        if (cell.hasClass('editable-date')) {
+	            var dateText = cell.data('original-value').trim();
+	            var parts = dateText.split(' ~ ');
+	
+	            var startDate = '';
+	            var endDate = '';
+	
+	            if (parts.length === 2) {
+	                startDate = parts[0].substring(0, 10); // yyyy-MM-dd
+	                endDate = parts[1].substring(0, 10);   // yyyy-MM-dd
+	            }
+	
 	            cell.html(
-	            	'<div style="display: flex; align-items: center; gap: 10px; justify-content: center;">' +
-	                    '<input type="date" name="startDate" class="form-control start-date" style="width: 150px;">' +
+	                '<div style="display: flex; align-items: center; gap: 10px; justify-content: center;">' +
+	                    '<input type="date" name="startDate" class="form-control start-date" style="width: 150px;" value="' + startDate + '">' +
 	                    '<span>~</span>' +
-	                    '<input type="date" name="endDate" class="form-control end-date" style="width: 150px;">' +
+	                    '<input type="date" name="endDate" class="form-control end-date" style="width: 150px;" value="' + endDate + '">' +
 	                '</div>'
 	            );
 	        } else {
@@ -149,10 +158,7 @@
 	        }
 	    });
 	
-	    // 모든 버튼 숨기기
 	    row.find('.edit-btn, .delete-btn, .view-btn').hide();
-	
-	    // 완료/취소 버튼 표시
 	    row.find('.complete-btn, .cancel-btn').show();
 	});
 

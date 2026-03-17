@@ -1,20 +1,119 @@
 /* startpage.css */
 
-/* 배경 이미지 */
+.login-box {
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	border-radius: 10px;
+	padding: 20px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	height: 300px;
+}
+
+.notice-box {
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	border-radius: 10px;
+	padding: 27.5px 20px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notice-box h2 {
+	font-size: 28px;
+	color: #333;
+	border-bottom: 2px solid #dee2e6;
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+
+.notice-table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #ffffff;
+	font-size: 14px;
+}
+
+.notice-table thead tr {
+	background-color: #e9ecef;
+	text-align: center;
+	font-weight: bold;
+	color: #495057;
+}
+
+.notice-table th, .notice-table td {
+	border: 1px solid #dee2e6;
+	padding: 10px;
+	text-align: center;
+}
+
+.notice-table tbody tr:hover {
+	background-color: #f1f3f5;
+	cursor: pointer;
+}
+
+.notice-table a:hover {
+	text-decoration: underline;
+	color: #0056b3;
+}
+
+.pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+	font-size: 14px;
+	flex-wrap: wrap;
+}
+
+.pagination a {
+	margin: 0 5px;
+	padding: 8px 12px;
+	text-decoration: none;
+	color: #007bff;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+}
+
+.pagination a:hover {
+	background-color: #f1f1f1;
+	color: #0056b3;
+}
+
+.pagination a.active {
+	background-color: #007bff;
+	color: white;
+	pointer-events: none;
+}
+
+.notice-empty {
+	text-align: center;
+	color: #6c757d;
+	font-size: 14px;
+	padding: 20px;
+}
+
+.timetable-card {
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	border-radius: 10px;
+	padding: 27.5px 20px;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.timetable-card .student-timetable-wrap {
+	padding: 0;
+}
+
 .background {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('../img/background/mainPage_Background.jpeg');
+    background-image: linear-gradient(rgba(240,244,255,0.72), rgba(240,244,255,0.72)), url('../img/background/mainPage_Background.jpeg');
     background-size: cover;
     background-position: center;
     z-index: -1;
     overflow: hidden;
 }
 
-/* HTML, Body 기본 설정 */
 html, body {
     height: 100%;
     margin: 0;
@@ -22,38 +121,197 @@ html, body {
     overflow-x: hidden;
 }
 
-/* 메인 페이지 전용 컨테이너 폭 조정 */
 .startcenter-container {
-    max-width: 1100px;
+    max-width: min(1440px, calc(100vw - 48px));
     margin: 0 auto;
     position: relative;
     z-index: 1;
 }
 
-/* 카드/영역이 너무 커 보이지 않도록 */
-.startcenter-container .login-box {
-    min-height: 320px;
+.startcenter-container .bg-body-tertiary,
+.startcenter-container .login-box,
+.startcenter-container .notice-box,
+.startcenter-container .timetable-card {
+    background: rgba(255,255,255,0.92) !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+.startcenter-container .row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 1.5rem;
+}
+
+#imageCarousel {
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+#imageCarousel .carousel-item img {
+    width: 100%;
+    height: clamp(320px, 34vw, 470px) !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    display: block;
+}
+
+#imageCarousel .carousel-control-prev,
+#imageCarousel .carousel-control-next {
+    width: 52px;
+    height: 52px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.36) !important;
+}
+
+.login-box {
+    min-height: 360px;
     height: auto;
 }
 
-.startcenter-container .notice-box h2 {
+.notice-box h2 {
     font-size: 28px;
 }
 
-/* FullCalendar 기본 레이아웃은 건드리지 않고 정렬만 */
+.fc,
+.fc * {
+    max-width: 100%;
+}
+
 .fc-col-header-cell {
     text-align: center;
 }
 
-/* 반응형 */
-@media (max-width: 768px) {
+.notice-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+@media (max-width: 992px) {
     .startcenter-container {
-        max-width: 100%;
-        padding-left: 10px;
-        padding-right: 10px;
-        transform: scale(0.8);
-    	transform-origin: top center;
-    	margin: 0 auto;
+        max-width: calc(100vw - 24px);
+    }
+
+    #imageCarousel .carousel-item img {
+        height: clamp(240px, 38vw, 360px) !important;
     }
 }
 
+@media (max-width: 768px) {
+    .startcenter-container {
+        max-width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+        transform: none;
+    }
+
+    #imageCarousel .carousel-item img {
+        height: 220px !important;
+    }
+}
+
+
+/* startcenter full-size layout tuning */
+.startcenter-container {
+    width: min(1680px, calc(100vw - 32px));
+    max-width: min(1680px, calc(100vw - 32px));
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.startcenter-container .row.align-items-md-stretch {
+    align-items: stretch !important;
+}
+
+.startcenter-container .col-md-7,
+.startcenter-container .col-md-5 {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.startcenter-container .col-md-7 > .bg-body-tertiary,
+.startcenter-container .col-md-5 > .login-box,
+.startcenter-container .col-md-5 > .notice-box,
+.startcenter-container .col-md-5 > .bus-card,
+.startcenter-container .col-md-7 > .timetable-card {
+    width: 100%;
+}
+
+.startcenter-container .bg-body-tertiary {
+    padding: 24px !important;
+    min-height: 540px;
+}
+
+.login-box {
+    min-height: 380px;
+}
+
+.login-box > div {
+    min-height: 380px;
+    padding: 2rem !important;
+}
+
+.notice-box {
+    min-height: 420px;
+}
+
+.notice-table th,
+.notice-table td {
+    padding: 12px 10px;
+}
+
+.timetable-card {
+    min-height: 360px;
+}
+
+.bus-card {
+    min-height: 420px;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+#recommendArea {
+    min-height: 64px;
+}
+
+@media (min-width: 1200px) {
+    .startcenter-container .col-md-7 {
+        width: 60%;
+    }
+    .startcenter-container .col-md-5 {
+        width: 40%;
+    }
+    .startcenter-container .bg-body-tertiary {
+        min-height: 610px;
+    }
+    .login-box,
+    .login-box > div {
+        min-height: 400px;
+    }
+    .notice-box,
+    .bus-card {
+        min-height: 440px;
+    }
+}
+
+@media (max-width: 992px) {
+    .startcenter-container {
+        width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .startcenter-container .bg-body-tertiary {
+        min-height: auto;
+    }
+    .login-box,
+    .login-box > div,
+    .notice-box,
+    .timetable-card,
+    .bus-card {
+        min-height: auto;
+    }
+}

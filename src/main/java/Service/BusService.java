@@ -9,7 +9,7 @@ public class BusService {
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/colbus?serverTimezone=Asia/Seoul",
+                "jdbc:mysql://localhost:3306/edumanager?serverTimezone=Asia/Seoul",
                 "root",
                 "0000"
         );

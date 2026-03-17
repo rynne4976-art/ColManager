@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- 외부 CSS -->
-<link href="<%=contextPath%>/css/email.css" rel="stylesheet">
+<link href="<%=contextPath%>/css/widget.css" rel="stylesheet">
 
 <style>
 html, body {

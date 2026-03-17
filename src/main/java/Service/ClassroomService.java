@@ -244,5 +244,39 @@ public class ClassroomService {
 
 		return classroomdao.updateAttendance(vo);
 	}
+	
+	// 전체 시간표 표 출력용
+	public Map<String, Map<String, String>> serviceGetStudentTimetable(String studentId) {
+		return classroomdao.getStudentTimetable(studentId);
+	}
+
+	// 미니 시간표 출력용
+	public List<Map<String, String>> serviceGetStudentTimetableMini(String studentId) {
+		return classroomdao.getStudentTimetableMini(studentId);
+	}
+	
+	// -----------------------------------------
+	// 수강신청 전 중복/시간충돌 검사 포함
+	public String serviceCourseInsertWithCheck(String courseId, String studentId) {
+
+		// 이미 신청한 과목인지 확인
+		if (classroomdao.isAlreadyEnrolled(courseId, studentId)) {
+			return "ALREADY_ENROLLED";
+		}
+
+		// 시간 충돌 확인
+		if (classroomdao.hasTimeConflict(courseId, studentId)) {
+			return "TIME_CONFLICT";
+		}
+
+		// 이상 없으면 수강신청
+		int result = classroomdao.courseInsert(courseId, studentId);
+
+		if (result > 0) {
+			return "SUCCESS";
+		}
+
+		return "FAIL";
+	}
 
 }

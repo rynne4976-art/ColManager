@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -158,50 +159,67 @@ public class ClassroomDAO {
 		return result;
 	}
 
+	
+	
 	//------------
 	// 해당 교수의 강의를 DB에서 찾아 반환하는 함수
-	public ArrayList<CourseVo> courseSearch(String professor_id) {
-		
-		ArrayList<CourseVo> courseList = new ArrayList<CourseVo>();
-		CourseVo course;
-		
-		try {
-			
-			con = ds.getConnection();
-			
-			String sql = "select c.course_id, c.course_name, r.room_id, r.capacity, r.equipment from course c "
-					   + "inner join classroom r on c.room_id = r.room_id "
-					   + "where professor_id=?";
-			
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, professor_id);
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()) {
-				course = new CourseVo();
-				course.setCourse_id(rs.getString("course_id"));
-				course.setCourse_name(rs.getString("course_name"));
-				
-				// ClassroomVo 객체 생성 후 강의실 정보를 설정
-				ClassroomVo classroom = new ClassroomVo();
-				classroom.setRoom_id(rs.getString("room_id"));
-				classroom.setCapacity(rs.getInt("capacity"));
-				classroom.setEquipment(rs.getString("equipment"));
-				
-				// CourseVo에 ClassroomVo 객체를 설정
-				course.setClassroom(classroom);
+	public ArrayList<CourseVo> courseSearch(String student_id) {
 
-				courseList.add(course);
-			}
-			
-		} catch (Exception e) {
-			System.out.println("ClassroomDAO의 courseSearch메소드에서 오류 ");
-			e.printStackTrace();
-		} finally {
-			closeResource(); // 자원 해제
-		}
-		
-		return courseList;
+	    ArrayList<CourseVo> courseList = new ArrayList<CourseVo>();
+	    CourseVo course;
+	    ProfessorVo professorVo;
+	    ClassroomVo classroom;
+
+	    try {
+	        con = ds.getConnection();
+
+	        String sql = "SELECT c.course_id, c.course_name, u.user_name, c.room_id, "
+	                   + "r.capacity, r.equipment, "
+	                   + "GROUP_CONCAT(CONCAT(ct.day_of_week, ' ', ct.period_no, '교시') "
+	                   + "ORDER BY FIELD(ct.day_of_week, '월','화','수','목','금'), ct.period_no SEPARATOR ', ') AS timetable_info "
+	                   + "FROM course c "
+	                   + "JOIN professor_info p ON c.professor_id = p.professor_id "
+	                   + "JOIN user u ON p.user_id = u.user_id "
+	                   + "LEFT JOIN classroom r ON c.room_id = r.room_id "
+	                   + "LEFT JOIN course_timetable ct ON c.course_id = ct.course_id "
+	                   + "WHERE u.role = '교수' "
+	                   + "AND c.course_id NOT IN ( "
+	                   + "    SELECT course_id FROM enrollment WHERE student_id = ? "
+	                   + ") "
+	                   + "GROUP BY c.course_id, c.course_name, u.user_name, c.room_id, r.capacity, r.equipment";
+
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, student_id);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            course = new CourseVo();
+	            course.setCourse_id(rs.getString("course_id"));
+	            course.setCourse_name(rs.getString("course_name"));
+	            course.setRoom_id(rs.getString("room_id"));
+	            course.setTimetable_info(rs.getString("timetable_info"));
+
+	            professorVo = new ProfessorVo();
+	            professorVo.setUser_name(rs.getString("user_name"));
+	            course.setProfessor_name(professorVo);
+
+	            classroom = new ClassroomVo();
+	            classroom.setRoom_id(rs.getString("room_id"));
+	            classroom.setCapacity(rs.getInt("capacity"));
+	            classroom.setEquipment(rs.getString("equipment"));
+	            course.setClassroom(classroom);
+
+	            courseList.add(course);
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("ClassroomDAO의 courseSearch 메소드에서 오류");
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return courseList;
 	}
 
 	//-----------
@@ -767,54 +785,58 @@ public class ClassroomDAO {
 
 	// 강의 리스트 조회 (수강신청)
 	public ArrayList<CourseVo> courseList(String studentId) {
-		
-		ArrayList<CourseVo> courseList = new ArrayList<CourseVo>();
-		
-		String sql = null;
-		CourseVo courseVo;
-		ProfessorVo professorVo;
-		try {
-			con = ds.getConnection();
-			
-			sql = "select c.course_id, c.course_name, u.user_name, c.room_id "
-				+ "from course c "
-				+ "join professor_info p on c.professor_id = p.professor_id "
-				+ "join user u on p.user_id = u.user_id "
-				+ "where role = '교수'AND c.course_id "
-				+ "NOT IN "
-				+ "(SELECT course_id "
-				+ " FROM enrollment "
-				+ " WHERE student_id = ? )";
-			
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, studentId);
-			
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()) {
-				
-				courseVo = new CourseVo();
-				courseVo.setCourse_id(rs.getString("course_id"));
-				courseVo.setCourse_name(rs.getString("course_name"));
-				courseVo.setRoom_id(rs.getString("room_id"));
-				
-				professorVo = new ProfessorVo();
-				professorVo.setUser_name(rs.getString("user_name"));
-				
-				courseVo.setProfessor_name(professorVo);
-				
-				courseList.add(courseVo);
-			
-			}
-			
-		}catch (Exception e) {
-			System.out.println("ClassroomDAO의 courseList 메소드 오류");
-			e.printStackTrace();
-		}finally {
-			closeResource();
-		}
-		
-		return courseList;
+
+	    ArrayList<CourseVo> courseList = new ArrayList<CourseVo>();
+
+	    String sql = null;
+	    CourseVo courseVo;
+	    ProfessorVo professorVo;
+
+	    try {
+	        con = ds.getConnection();
+
+	        sql = "SELECT c.course_id, c.course_name, u.user_name, c.room_id, "
+	            + "GROUP_CONCAT(CONCAT(ct.day_of_week, ' ', ct.period_no, '교시') "
+	            + "ORDER BY FIELD(ct.day_of_week, '월','화','수','목','금'), ct.period_no SEPARATOR ', ') AS timetable_info "
+	            + "FROM course c "
+	            + "JOIN professor_info p ON c.professor_id = p.professor_id "
+	            + "JOIN user u ON p.user_id = u.user_id "
+	            + "LEFT JOIN course_timetable ct ON c.course_id = ct.course_id "
+	            + "WHERE u.role = '교수' "
+	            + "AND c.course_id NOT IN ( "
+	            + "    SELECT course_id "
+	            + "    FROM enrollment "
+	            + "    WHERE student_id = ? "
+	            + ") "
+	            + "GROUP BY c.course_id, c.course_name, u.user_name, c.room_id";
+
+	        pstmt = con.prepareStatement(sql);
+	        pstmt.setString(1, studentId);
+
+	        rs = pstmt.executeQuery();
+
+	        while(rs.next()) {
+	            courseVo = new CourseVo();
+	            courseVo.setCourse_id(rs.getString("course_id"));
+	            courseVo.setCourse_name(rs.getString("course_name"));
+	            courseVo.setRoom_id(rs.getString("room_id"));
+	            courseVo.setTimetable_info(rs.getString("timetable_info"));
+
+	            professorVo = new ProfessorVo();
+	            professorVo.setUser_name(rs.getString("user_name"));
+	            courseVo.setProfessor_name(professorVo);
+
+	            courseList.add(courseVo);
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("ClassroomDAO의 courseList 메소드 오류");
+	        e.printStackTrace();
+	    } finally {
+	        closeResource();
+	    }
+
+	    return courseList;
 	}
 
 	
@@ -877,12 +899,16 @@ public class ClassroomDAO {
 		try {
 			con = ds.getConnection();
 			
-			sql = "select c.course_id, c.course_name, u.user_name, c.room_id "
-				+ "from course c "
-				+ "join professor_info p on c.professor_id = p.professor_id "
-				+ "join user u on p.user_id = u.user_id "
-				+ "join enrollment e on e.course_id = c.course_id "
-				+ "where student_id = ? ";
+			sql = "SELECT c.course_id, c.course_name, u.user_name, c.room_id, "
+				    + "GROUP_CONCAT(CONCAT(ct.day_of_week, ' ', ct.period_no, '교시') "
+				    + "ORDER BY FIELD(ct.day_of_week, '월','화','수','목','금'), ct.period_no SEPARATOR ', ') AS timetable_info "
+				    + "FROM course c "
+				    + "JOIN professor_info p ON c.professor_id = p.professor_id "
+				    + "JOIN user u ON p.user_id = u.user_id "
+				    + "JOIN enrollment e ON e.course_id = c.course_id "
+				    + "LEFT JOIN course_timetable ct ON c.course_id = ct.course_id "
+				    + "WHERE e.student_id = ? "
+				    + "GROUP BY c.course_id, c.course_name, u.user_name, c.room_id";
 			
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, studentId);
@@ -895,6 +921,7 @@ public class ClassroomDAO {
 				courseVo.setCourse_id(rs.getString("course_id"));
 				courseVo.setCourse_name(rs.getString("course_name"));
 				courseVo.setRoom_id(rs.getString("room_id"));
+				courseVo.setTimetable_info(rs.getString("timetable_info"));
 				
 				professorVo = new ProfessorVo();
 				professorVo.setUser_name(rs.getString("user_name"));
@@ -1280,6 +1307,164 @@ public class ClassroomDAO {
 	    }
 
 	    return 0;
+	}
+	
+	// 학생 전체 시간표 조회
+	// key 예: 월_1, 화_3
+	// value: 과목명 / 강의실 / 교수명 등을 담은 Map
+	public Map<String, Map<String, String>> getStudentTimetable(String studentId) {
+
+		Map<String, Map<String, String>> timetableMap = new LinkedHashMap<>();
+
+		try {
+			con = ds.getConnection();
+
+			String sql =
+					"SELECT c.course_id, c.course_name, ct.day_of_week, ct.period_no, c.room_id, u.user_name AS professor_name " +
+					"FROM enrollment e " +
+					"JOIN course c ON e.course_id = c.course_id " +
+					"JOIN course_timetable ct ON c.course_id = ct.course_id " +
+					"JOIN professor_info p ON c.professor_id = p.professor_id " +
+					"JOIN user u ON p.user_id = u.user_id " +
+					"WHERE e.student_id = ? " +
+					"ORDER BY FIELD(ct.day_of_week, '월', '화', '수', '목', '금'), ct.period_no";
+
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, studentId);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				String day = rs.getString("day_of_week");
+				int period = rs.getInt("period_no");
+				String key = day + "_" + period;
+
+				Map<String, String> cell = new HashMap<>();
+				cell.put("course_id", rs.getString("course_id"));
+				cell.put("course_name", rs.getString("course_name"));
+				cell.put("room_id", rs.getString("room_id"));
+				cell.put("professor_name", rs.getString("professor_name"));
+				cell.put("day_of_week", day);
+				cell.put("period_no", String.valueOf(period));
+
+				timetableMap.put(key, cell);
+			}
+
+		} catch (Exception e) {
+			System.out.println("ClassroomDAO의 getStudentTimetable 메소드에서 오류");
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+
+		return timetableMap;
+	}
+
+	// 미니 시간표용: 오늘/가까운 시간표가 아니라
+	// 그냥 전체 시간표 리스트 형태로 간단 조회
+	public List<Map<String, String>> getStudentTimetableMini(String studentId) {
+
+		List<Map<String, String>> timetableList = new ArrayList<>();
+
+		try {
+			con = ds.getConnection();
+
+			String sql =
+					"SELECT c.course_name, ct.day_of_week, ct.period_no, c.room_id " +
+					"FROM enrollment e " +
+					"JOIN course c ON e.course_id = c.course_id " +
+					"JOIN course_timetable ct ON c.course_id = ct.course_id " +
+					"WHERE e.student_id = ? " +
+					"ORDER BY FIELD(ct.day_of_week, '월', '화', '수', '목', '금'), ct.period_no";
+
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, studentId);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				Map<String, String> row = new HashMap<>();
+				row.put("course_name", rs.getString("course_name"));
+				row.put("day_of_week", rs.getString("day_of_week"));
+				row.put("period_no", String.valueOf(rs.getInt("period_no")));
+				row.put("room_id", rs.getString("room_id"));
+
+				timetableList.add(row);
+			}
+
+		} catch (Exception e) {
+			System.out.println("ClassroomDAO의 getStudentTimetableMini 메소드에서 오류");
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+
+		return timetableList;
+	}
+	
+	// -----------------------------------------
+	// 이미 수강신청한 과목인지 확인
+	public boolean isAlreadyEnrolled(String courseId, String studentId) {
+
+		try {
+			con = ds.getConnection();
+
+			String sql = "SELECT COUNT(*) FROM enrollment WHERE student_id = ? AND course_id = ?";
+
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, studentId);
+			pstmt.setString(2, courseId);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
+
+		} catch (Exception e) {
+			System.out.println("ClassroomDAO의 isAlreadyEnrolled 메소드 오류");
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+
+		return false;
+	}
+	
+	// -----------------------------------------
+	// 수강신청하려는 과목이 기존 수강 과목과 시간 충돌이 있는지 확인
+	public boolean hasTimeConflict(String courseId, String studentId) {
+
+		try {
+			con = ds.getConnection();
+
+			String sql =
+					"SELECT COUNT(*) " +
+					"FROM course_timetable new_ct " +
+					"JOIN enrollment e ON e.student_id = ? " +
+					"JOIN course_timetable my_ct ON e.course_id = my_ct.course_id " +
+					"WHERE new_ct.course_id = ? " +
+					"AND new_ct.day_of_week = my_ct.day_of_week " +
+					"AND new_ct.period_no = my_ct.period_no";
+
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, studentId);
+			pstmt.setString(2, courseId);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
+
+		} catch (Exception e) {
+			System.out.println("ClassroomDAO의 hasTimeConflict 메소드 오류");
+			e.printStackTrace();
+		} finally {
+			closeResource();
+		}
+
+		return false;
 	}
 
 }

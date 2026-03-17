@@ -225,7 +225,7 @@ String name = (String) session.getAttribute("name");
 						
 						<div class="sb-sidenav-menu-heading">schedule</div>
 						<a class="nav-link"
-							href="<%=contextPath%>/classroom/course_submit.bo?classroomCenter=/view_classroom/studentTimetable.jsp">
+							href="<%=contextPath%>/classroom/studentTimetable.bo">
 							<div class="sb-nav-link-icon">
 								<i class="fas fa-tachometer-alt"></i>
 							</div> 주간 시간표

@@ -4,6 +4,8 @@
 <%@page import="java.net.URLDecoder"%>
 <%@page import="Vo.BoardVo"%>
 <%@page import="java.util.ArrayList"%>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
@@ -42,6 +44,10 @@ totalBlock = (int) Math.ceil((double) totalPage / pagePerBlock);
 if (request.getAttribute("nowBlock") != null) {
 	nowBlock = Integer.parseInt(request.getAttribute("nowBlock").toString());
 }
+
+Date now = new Date();
+SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+String formattedNow = sdf.format(now);
 %>
 
 <!doctype html>
@@ -110,7 +116,7 @@ if (request.getAttribute("nowBlock") != null) {
 
 
 
-	<div style="padding: 50px 150px 50px 150px">
+	<div style="padding: 50px 200px 50px 200px">
 
 		<!-- 자동 캐러셀 -->
 		<section class="carousel" id="carousel">
@@ -139,7 +145,8 @@ if (request.getAttribute("nowBlock") != null) {
 			<!-- 행 전체에 하단 여백 추가 -->
 			<!-- 학사 일정 영역 -->
 			<div class="col-md-7" style="margin-bottom: 10px;">
-				<div class="bg-body-tertiary rounded-3" style="padding: 15px;">
+				<div class="bg-light border rounded-3 d-flex flex-column justify-content-center" style="padding: 15px;">
+				
 					<jsp:include page="/common/calendar.jsp" />
 				</div>
 
@@ -293,8 +300,9 @@ if (request.getAttribute("nowBlock") != null) {
 						</div>
 					</div>
 				</div>
-
-				<div class="bus-card">
+			
+			<div class="bus-card bg-light border rounded-3 d-flex flex-column justify-content-center">
+				<div class="">
 					<h3 class="bus-title">🚌 학내 버스 검색</h3>
 
 					<div class="bus-search-box">
@@ -315,7 +323,7 @@ if (request.getAttribute("nowBlock") != null) {
 
 						<div class="bus-row">
 							<div class="bus-group">
-								<label>수업 종료시간</label> <input type="time" id="classEndTime">
+								<label>수업 종료시간</label> <input type="time" id="classEndTime" value="<%= formattedNow %>">
 							</div>
 						</div>
 
@@ -323,8 +331,8 @@ if (request.getAttribute("nowBlock") != null) {
 							버스 찾기</button>
 					</div>
 
-					<div class="bus-table-wrap">
-						<table class="bus-table">
+					<div class="bus-table-wrap bg-light border rounded-3">
+						<table class="bus-table" >
 							<thead>
 								<tr>
 									<th>시간</th>
@@ -339,6 +347,7 @@ if (request.getAttribute("nowBlock") != null) {
 
 					<div id="recommendArea"></div>
 				</div>
+			</div>
 			</div>
 		</div>
 	</div>

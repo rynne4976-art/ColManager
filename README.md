@@ -14,17 +14,19 @@
 4. [프로젝트 구조](#-프로젝트-구조)
 5. [주요 기능](#-주요-기능)
 6. [데이터베이스 구조](#-데이터베이스-구조)
-7. [역할 분배](#-역할-분배)
+7. [API 명세 요약](#-API-명세-요약)
+8. [역할 분배](#-역할-분배)
+9. [대표 사용자 계정](#-대표-사용자-계정)
 
 ---
 
-## 🎯 프로젝트 소개
+## 1. 🎯 프로젝트 소개
 
 | 항목 | 내용 |
 |------|------|
 | 프로젝트명 | 팀 대학교 학사 관리 시스템|
 | 기간 | 25일 |
-| 인원 | 5명 |
+| 인원 | 4명 |
 | 목표 | JSP + Servlet 기반 MVC 웹 애플리케이션 형태로 학사관리서비스 페이지 구현 |
 <br>
 
@@ -58,7 +60,7 @@
 
 ---
 
-## 🛠️ 기술 스택
+## 2. 🛠️ 기술 스택
 
 | 구분 | 기술 |
 |------|------|
@@ -70,11 +72,11 @@
 
 ---
 
-## 🚀 실행 방법
+## 3. 🚀 실행 방법
 
 ### ⚙️ 사전 요구사항
 
-- **JDK 8 이상**(권장: JDK 11 또는 JDK 21)
+- **JDK 21 이상**
 - **Apache Tomcat (9.0 권장)**
 - **Eclipse IDE (Enterprise Edition)** 설치 필수!
 
@@ -103,7 +105,7 @@ git clone https://github.com/rynne4976-art/ColManager.git
 
 ---
 
-## 📁 프로젝트 구조
+## 4. 📁 프로젝트 구조
 
 ```
 
@@ -209,7 +211,7 @@ ColManager/
 
 ```
 ---
-## 🚀 주요 기능
+## 5. 🚀 주요 기능
 
 > ### 🏫 학사 관리 시스템
 - 강의 개설 및 강의 목록 조회
@@ -268,85 +270,75 @@ ColManager/
 <br>
 
 ---
-## 📊 ERD (데이터베이스 설계)
+## 6. 📊 데이터베이스 구조
 
-```
-┌──────────────┐     ┌──────────────────┐     ┌──────────────┐
-│   Member     │     │   Restaurant     │     │   Review     │
-├──────────────┤     ├──────────────────┤     ├──────────────┤
-│ id (PK)      │──┐  │ id (PK)          │──┐  │ id (PK)      │
-│ email        │  │  │ name             │  │  │ content      │
-│ password     │  │  │ category (Enum)  │  │  │ rating (1~5) │
-│ nickname     │  ├──│ member_id (FK)   │  ├──│ restaurant_id│
-│ role (Enum)  │  │  │ address          │  │  │ member_id(FK)│
-│ created_at   │  │  │ phone            │  │  │ created_at   │
-└──────────────┘  │  │ description      │  │  └──────────────┘
-                  │  │ created_at       │  │
-                  │  └──────────────────┘  │
-                  │                        │
-                  │  ┌──────────────────┐  │
-                  │  │   Wishlist       │  │
-                  │  ├──────────────────┤  │
-                  │  │ id (PK)          │  │
-                  ├──│ member_id (FK)   │  │
-                  │  │ restaurant_id(FK)│──┘
-                  │  │ created_at       │
-                  │  └──────────────────┘
-```
----
-### 관계 정리
+<img width="1676" height="1245" alt="ColManager edumanager sql" src="https://github.com/user-attachments/assets/445ae599-905e-401a-a9a2-cdf70e88a627" />
 
-| 관계 | 설명 |
-|------|------|
-| Member → Restaurant | 1:N (한 회원이 여러 맛집 등록) |
-| Member → Review | 1:N (한 회원이 여러 리뷰 작성) |
-| Restaurant → Review | 1:N (한 맛집에 여러 리뷰) |
-| Member → Wishlist | 1:N (한 회원이 여러 맛집 찜) |
-| Restaurant → Wishlist | 1:N (한 맛집이 여러 회원에게 찜됨) |
 
 ---
+## 7. 📡 API 명세 요약 
 
-## 📡 API 명세 요약
+>### 🔐 회원 기능
+| Method | URL | 설명 | 
+|--------|-----|------| 
+| POST | /member/login.do | 로그인 처리 | 
+| GET | /member/logout.do | 로그아웃 | 
+| POST | /member/register.do | 회원가입 | 
+<br> 
 
-자세한 내용은 [docs/API_SPEC.md](docs/API_SPEC.md) 참조
+> ### 🏫 강의 / 학사 기능
+| Method | URL | 설명 | 
+|--------|-----|------| 
+| GET | /course/list.do | 강의 목록 조회 | 
+| GET | /course/detail.do | 강의 상세 조회 | 
+| POST | /course/register.do | 강의 개설 (교수) | 
+| GET | /enrollment/list.do | 수강 목록 조회 | 
+| POST | /enrollment/apply.do | 수강 신청 | 
+<br> 
 
-| Method | URL | 설명 | 담당 |
-|--------|-----|------|------|
-| POST | /api/members/signup | 회원가입 | A |
-| POST | /api/members/login | 로그인 | A |
-| GET | /api/members/logout | 로그아웃 | A |
-| GET | /api/restaurants | 맛집 목록 | B |
-| GET | /api/restaurants/{id} | 맛집 상세 | B |
-| POST | /api/restaurants | 맛집 등록 | B |
-| PUT | /api/restaurants/{id} | 맛집 수정 | B |
-| DELETE | /api/restaurants/{id} | 맛집 삭제 | B |
-| GET | /api/restaurants/search | 맛집 검색 | B |
-| GET | /api/reviews/restaurant/{id} | 리뷰 목록 | C |
-| POST | /api/reviews | 리뷰 작성 | C |
-| DELETE | /api/reviews/{id} | 리뷰 삭제 | C |
-| GET | /api/wishlists | 찜 목록 | D |
-| POST | /api/wishlists/{restaurantId} | 찜 추가 | D |
-| DELETE | /api/wishlists/{restaurantId} | 찜 취소 | D |
+> ### 📝 과제 기능
+| Method | URL | 설명 | 
+|--------|-----|------| 
+| GET | /assignment/list.do | 과제 목록 조회 | 
+| POST | /assignment/create.do | 과제 등록 (교수) | 
+| POST | /submission/submit.do | 과제 제출 | 
+| GET | /submission/list.do | 제출 내역 조회 |
+<br>
+
+>### 📢 게시판 기능
+| Method | URL | 설명 | 
+|--------|-----|------|
+| GET	| /board/list.do | 게시글 목록 조회 |
+| GET |	/board/read.do | 게시글 상세 조회 |
+| POST | /board/write.do	| 게시글 작성 |
+| POST | /board/reply.do |	댓글 작성 |
+| POST| /board/delete.do | 게시글 삭제 |
+<br>
+
+>### 📅 일정 / 기타 기능
+| Method | URL | 설명 | 
+|--------|-----|------|
+| GET	| /calendar/view.do	| 학사 일정 조회 |
+| POST | /calendar/edit.do | 일정 등록/수정 |
+| GET |	/bus/timetable.do |	학내 버스 시간표 조회 |
+<br>
 
 ---
+## 8. 👥 역할 분배
 
-## 👥 역할 분배
-
-자세한 내용은 [docs/TODO_BY_ROLE.md](docs/TODO_BY_ROLE.md) 참조
-
-| 역할 | 담당 영역 | 주요 파일 |
-|------|----------|----------|
-| **A** (회원) | 회원가입, 로그인/로그아웃, 세션 관리 | MemberService, MemberApiController, login.jsp, signup.jsp |
-| **B** (맛집) | 맛집 CRUD, 검색, 카테고리 필터 | RestaurantService, RestaurantApiController, list.jsp, detail.jsp, form.jsp |
-| **C** (리뷰) | 리뷰 작성/삭제, 별점 표시 | ReviewService, ReviewApiController, detail.jsp(리뷰 섹션) |
-| **D** (찜+홈) | 찜하기, 홈 컨트롤러, 전체 JSP 보완 | WishlistService, WishlistApiController, HomeController |
+| 역할 | 담당 영역 | 
+|------|----------|
+| **이영호** (조장) | 논문 검색, 취업 박람회, 주간 시간표 | 
+| **김용민** (부조장) | 출결관리, 개인성적다운로드, ai봇, startcenter.jsp공지사항 ajax적용 |
+| **서세민** | 이메일 전송 및 채팅, 번역 기능,  성적/졸업 증명서 출력 기능, GPA계산 기능  |
+| **진주원** | 버스시간표 제작 및 버스 추천 기능 |
 
 ---
 
-## 🔑 테스트 계정
+## 9. 🔑 대표 사용자 계정
 
-| 이메일 | 비밀번호 | 닉네임 | 역할 |
-|--------|---------|--------|------|
-| admin@test.com | 1234 | 관리자 | ADMIN |
-| user1@test.com | 1234 | 맛집탐험가 | USER |
-| user2@test.com | 1234 | 먹보킹 | USER |
+| 아이디 | 비밀번호 | 닉네임 | 역할 | 이메일 |
+|--------|---------|--------|------|------|
+| admin1 | pass123 | 관리자1 | ADMIN | test@naver.com |
+| professor1 | pass123 | 교수1 | PROFESSOR | lee@example.com |
+| student1 | pass123 | 학생1 | STUDENT | hong@example.com |

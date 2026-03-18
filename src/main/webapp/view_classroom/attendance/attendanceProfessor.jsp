@@ -3,8 +3,10 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<div class="container-fluid px-4 mt-4">
-    <h2 class="mb-4">출석 관리</h2>
+<div class="attendance-page-wrap">
+    <div class="text-center mb-4">
+        <h1 class="display-4">출석 관리</h1>
+    </div>
 
     <c:if test="${not empty attendanceMessage}">
         <div class="alert 

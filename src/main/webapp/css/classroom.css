@@ -1,0 +1,369 @@
+/* ========================= */
+/* 메인 홈페이지 톤 맞춤용 */
+/* ========================= */
+:root {
+    --main-blue-start: #3b82f6;
+    --main-blue-end: #1e40af;
+    --page-bg: #f4f6f9;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(148, 163, 184, 0.18);
+    --card-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    --radius-lg: 18px;
+    --radius-xl: 22px;
+    --text-main: #222;
+    --text-sub: #6c757d;
+}
+
+/* ========================= */
+/* 전체 배경 */
+/* ========================= */
+body.sb-nav-fixed {
+    background: var(--page-bg) !important;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+#layoutSidenav_content {
+    background: var(--page-bg) !important;
+    padding: 24px !important;
+}
+
+#layoutSidenav {
+    align-items: flex-start;
+}
+
+/* ========================= */
+/* 상단바 */
+/* ========================= */
+.sb-topnav {
+    background: linear-gradient(135deg, var(--main-blue-start), var(--main-blue-end)) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 8px 24px rgba(14, 30, 84, 0.16) !important;
+    min-height: 84px;
+    z-index: 1030;
+}
+
+.sb-topnav .navbar-brand,
+.sb-topnav .nav-link,
+.sb-topnav p,
+.sb-topnav span,
+.sb-topnav i {
+    color: #fff !important;
+    font-weight: 700;
+}
+
+#sidebarToggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    margin-left: 12px !important;
+}
+
+#sidebarToggle:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.sb-topnav .btn.btn-light {
+    color: #fff !important;
+    font-weight: 700;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.sb-topnav .btn.btn-light:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+}
+
+/* ========================= */
+/* 사이드바 */
+/* ========================= */
+#layoutSidenav_nav {
+    padding-top: 0 !important;
+    margin-top: 40px;
+    height: calc(100vh - 40px);
+    padding-bottom: 50px !important;
+}
+
+#layoutSidenav_nav .sb-sidenav {
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+#layoutSidenav_nav .sb-sidenav-menu {
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-top: 18px;
+}
+
+.sb-sidenav-dark {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu-heading {
+    color: #94a3b8 !important;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    margin-top: 10px;
+    padding-top: 6px;
+}
+
+.sb-sidenav-dark .sb-sidenav-menu-heading:first-of-type {
+    margin-top: -8px !important;
+    padding-top: 0 !important;
+}
+
+.sb-sidenav-dark .nav-link,
+.sb-sidenav-dark .nav-link .sb-nav-link-icon,
+.sb-sidenav-dark .sb-sidenav-collapse-arrow {
+    color: #334155 !important;
+}
+
+.sb-sidenav-dark .nav-link {
+    border-radius: 10px;
+    margin: 3px 10px;
+    padding: 11px 14px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sb-sidenav-dark .nav-link:hover {
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.sb-sidenav-dark .nav-link:hover .sb-nav-link-icon,
+.sb-sidenav-dark .nav-link:hover .sb-sidenav-collapse-arrow {
+    color: #2563eb !important;
+}
+
+.sb-sidenav-dark .nav-link.active {
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    font-weight: 700;
+}
+
+.sb-sidenav-dark .nav-link.active .sb-nav-link-icon,
+.sb-sidenav-dark .nav-link.active .sb-sidenav-collapse-arrow {
+    color: #2563eb !important;
+}
+
+.sb-sidenav-dark .nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    border-radius: 4px;
+    background: #2563eb;
+}
+
+.sb-sidenav-dark .collapse .nav-link {
+    padding-left: 30px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #334155 !important;
+}
+
+/* ========================= */
+/* 공통 카드 */
+/* ========================= */
+.card,
+.timetable-card,
+.notice-card,
+.assignment-card,
+.content-card,
+.dashboard-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--card-shadow) !important;
+    overflow: hidden;
+}
+
+.card-header {
+    background: transparent !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    color: #333 !important;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 18px 20px !important;
+}
+
+.card-body {
+    padding: 20px !important;
+}
+
+/* ========================= */
+/* 히어로 영역 */
+/* ========================= */
+.hero-card,
+.main-hero,
+.classroom-hero {
+    background: linear-gradient(135deg, var(--main-blue-start), var(--main-blue-end)) !important;
+    border-radius: var(--radius-xl) !important;
+    color: #fff !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ========================= */
+/* 테이블 */
+/* ========================= */
+.table {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th,
+table thead th {
+    background-color: #edf3ff !important;
+    color: #2446b6 !important;
+    text-align: center;
+    font-weight: 800 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.table td,
+.table th,
+table td,
+table th {
+    border: 1px solid #dee2e6 !important;
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover,
+table tbody tr:hover {
+    background-color: #f1f3f5 !important;
+}
+
+/* ========================= */
+/* 입력창 */
+/* ========================= */
+.form-control,
+.form-select,
+input,
+select,
+textarea {
+    border-radius: 10px !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.15rem rgba(59, 130, 246, 0.15) !important;
+}
+
+/* ========================= */
+/* 기본 텍스트 */
+/* ========================= */
+h1, h2, h3, h4, h5 {
+    color: var(--text-main) !important;
+    font-weight: 800;
+}
+
+p, span, label, td, th, li {
+    color: var(--text-main);
+}
+
+small,
+.text-muted {
+    color: var(--text-sub) !important;
+}
+
+/* ========================= */
+/* 학생 강의실 / 시간표 공통 */
+/* ========================= */
+.student-classroom-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.timetable-card,
+.attendance-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    position: relative;
+    padding-left: 12px;
+}
+
+.section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 4px;
+    height: 20px;
+    background: #2563eb;
+    border-radius: 4px;
+}
+
+/* ========================= */
+/* 출석 페이지 전용 */
+/* ========================= */
+.attendance-page-wrap {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+.attendance-page-wrap .attendance-card {
+    width: 100%;
+    max-width: none;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+.attendance-page-wrap .inner-card {
+    width: 100%;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.attendance-page-wrap .table-responsive {
+    width: 100%;
+}
+
+.attendance-page-wrap .table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.collapsing {
+    transition: none !important;
+}
+
+.sb-sidenav {
+    width: 250px;
+    min-width: 250px;
+}

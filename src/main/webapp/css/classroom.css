@@ -15,11 +15,15 @@
 }
 
 /* ========================= */
-/* 전체 배경 */
+/* 전체 배경 / 레이아웃 */
 /* ========================= */
 body.sb-nav-fixed {
     background: var(--page-bg) !important;
     font-family: "Noto Sans KR", sans-serif;
+}
+
+#layoutSidenav {
+    align-items: flex-start;
 }
 
 #layoutSidenav_content {
@@ -27,8 +31,11 @@ body.sb-nav-fixed {
     padding: 24px !important;
 }
 
-#layoutSidenav {
-    align-items: flex-start;
+/* 데스크탑에서 사이드바 옆 여백 추가 */
+@media (min-width: 992px) {
+    .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
+        padding-left: 241px !important; /* 기존 225px + 16px 여백 */
+    }
 }
 
 /* ========================= */
@@ -86,9 +93,12 @@ body.sb-nav-fixed {
     margin-top: 40px;
     height: calc(100vh - 40px);
     padding-bottom: 50px !important;
+    overflow: hidden !important;
 }
 
 #layoutSidenav_nav .sb-sidenav {
+    width: 250px;
+    min-width: 250px;
     height: 100% !important;
     overflow: hidden !important;
 }
@@ -98,6 +108,8 @@ body.sb-nav-fixed {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding-top: 18px;
+    padding-bottom: 50px !important;
+    scrollbar-gutter: stable;
 }
 
 .sb-sidenav-dark {
@@ -359,11 +371,9 @@ small,
     margin-bottom: 0;
 }
 
+/* ========================= */
+/* collapse */
+/* ========================= */
 .collapsing {
     transition: none !important;
-}
-
-.sb-sidenav {
-    width: 250px;
-    min-width: 250px;
 }

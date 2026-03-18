@@ -219,15 +219,15 @@ String name = (String) session.getAttribute("name");
 						<a class="nav-link"
 							href="<%=contextPath%>/classroom/course_submit.bo?classroomCenter=/view_classroom/courseSubmit.jsp">
 							<div class="sb-nav-link-icon">
-								<i class="fas fa-tachometer-alt"></i>
-							</div> 수강신청
+								<i class="fas fa-pen-to-square"></i>
+							</div> 수강 신청
 						</a>
 						
 						<div class="sb-sidenav-menu-heading">schedule</div>
 						<a class="nav-link"
 							href="<%=contextPath%>/classroom/studentTimetable.bo">
 							<div class="sb-nav-link-icon">
-								<i class="fas fa-tachometer-alt"></i>
+								<i class="fas fa-calendar-alt"></i>
 							</div> 주간 시간표
 						</a>
 

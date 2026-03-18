@@ -43,12 +43,12 @@
 </style>
 </head>
 <body>
-<div class="container py-4">
+<div class="container mt-5">
 
     <!-- 페이지 헤더 -->
-    <div class="mb-4">
-        <h4 class="fw-bold mb-1"><i class="fas fa-file-alt me-2 text-secondary"></i>증명서 조회</h4>
-        <p class="text-muted small mb-0">성적증명서와 졸업증명서를 조회하거나 다운로드할 수 있습니다.</p>
+    <div class="text-center mt-5">
+        <h1 class="display-4"><i class="fas fa-chalkboard-teacher"></i>  증명서 조회</h1>
+        <p class="lead">적증명서와 졸업증명서를 조회하거나 다운로드할 수 있습니다.</p>
     </div>
 
     <!-- 학생 기본 정보 -->

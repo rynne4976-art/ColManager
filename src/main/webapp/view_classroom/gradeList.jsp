@@ -29,7 +29,9 @@
 </head>
 <body class="bg-light">
     <main class="container my-5">
-        <h2 class="text-center mb-4">성적 목록</h2>
+        <div class="text-center mb-4">
+	        <h1 class="display-4"><i class="fas fa-chart-area"></i>  성적 조회</h1>
+	    </div>
         
         <div class="d-flex justify-content-end mb-3">
             <form id="excelDownloadForm" action="<%=contextPath%>/classroom/download.do" method="get" target="downloadFrame" style="margin:0;">

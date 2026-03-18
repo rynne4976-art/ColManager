@@ -18,139 +18,269 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-    <style>
-        body.bg-light {
-            background-color: #f8f9fb !important;
-        }
-
-        h1.display-4 {
-            color: #4CAF50;
-        }
-
-        .student-classroom-wrap {
-            max-width: 1500px;
-        }
-
-        .student-timetable-panel {
-            background: #fff;
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            height: 100%;
-        }
-
-        .student-timetable-panel .mini-timetable-card {
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-        }
-
-        .student-timetable-panel .mini-timetable-header h3 {
-            font-size: 1.8rem;
-        }
-
-        .student-timetable-panel .mini-timetable-more {
-            padding: 8px 16px;
-            font-size: 0.95rem;
-        }
-
-        .student-timetable-panel .mini-timetable-table th,
-        .student-timetable-panel .mini-timetable-table td {
-            height: 78px;
-            font-size: 16px;
-        }
-
-        .student-timetable-panel .mini-subject {
-            font-size: 15px;
-        }
-
-        .student-timetable-panel .mini-period-col {
-            width: 64px;
-            font-size: 15px;
-        }
-
-        .summary-card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .summary-card .card-header {
-            font-weight: 700;
-            padding: 14px 18px;
-        }
-
-        .summary-card .card-body {
-            padding: 16px 18px;
-        }
-
-        .assignment-summary .card-header {
-            background-color: #e8f5e9;
-            color: #1b5e20;
-        }
-
-        .notice-summary .card-header {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-        }
-
-        .summary-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .summary-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #edf1f5;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-
-        .summary-title {
-            font-weight: 700;
-            font-size: 0.98rem;
-            color: #222;
-            margin-bottom: 4px;
-        }
-
-        .summary-course {
-            font-size: 0.87rem;
-            color: #6c757d;
-            margin-bottom: 4px;
-        }
-
-        .summary-date {
-            font-size: 0.82rem;
-            color: #8a94a6;
-        }
-
-        .summary-empty {
-            color: #888;
-            text-align: center;
-            padding: 16px 0;
-            font-size: 0.95rem;
-        }
-
-        @media (max-width: 991px) {
-            .student-timetable-panel .mini-timetable-header h3 {
-                font-size: 1.5rem;
-            }
-
-            .student-timetable-panel .mini-timetable-table th,
-            .student-timetable-panel .mini-timetable-table td {
-                height: 68px;
-                font-size: 14px;
-            }
-
-            .student-timetable-panel .mini-subject {
-                font-size: 14px;
-            }
-        }
-    </style>
+	<style>
+	    body.bg-light {
+	        background-color: #f4f6f9 !important;
+	    }
+	
+		.student-classroom-wrap {
+		    max-width: 1300px;
+		    margin: 0 auto;
+		    padding: 0 16px;
+		}
+		
+		.student-classroom-wrap .row {
+		    --bs-gutter-x: 1.75rem;
+		}
+		
+	
+	    /* 상단 제목은 유지하고 아래 카드들만 다듬기 */
+	    header.mb-4.text-center {
+	        margin-bottom: 28px !important;
+	    }
+	
+	    header.mb-4.text-center h1 {
+	        font-weight: 800;
+	        color: #222;
+	    }
+	
+	    header.mb-4.text-center p {
+	        font-size: 1rem;
+	        color: #6c757d !important;
+	    }
+	
+	    /* 시간표 영역 */
+	    .student-timetable-panel,
+	    .summary-card {
+	        background: rgba(255,255,255,0.92);
+	        border: 1px solid rgba(148, 163, 184, 0.18);
+	        border-radius: 18px;
+	        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+	        overflow: hidden;
+	    }
+	
+	    .student-timetable-panel {
+	        padding: 22px 22px 18px;
+	        height: 100%;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-card {
+	        width: 100%;
+	        max-width: 100%;
+	        margin: 0;
+	        background: transparent !important;
+	        box-shadow: none !important;
+	        border: none !important;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-header {
+	        margin-bottom: 16px;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-header h3 {
+	        font-size: 2rem;
+	        font-weight: 800;
+	        color: #1f2937;
+	        margin-bottom: 0;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-more {
+	        padding: 9px 16px;
+	        font-size: 0.95rem;
+	        border-radius: 10px;
+	        border: none;
+	        background: linear-gradient(135deg, #3b82f6, #1e40af);
+	        color: #fff;
+	        font-weight: 700;
+	    }
+	
+	    /* 시간표 테이블 */
+	    .student-timetable-panel .mini-timetable-table {
+	        overflow: hidden;
+	        border-radius: 14px;
+	        margin-bottom: 0;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-table th {
+	        background-color: #edf3ff !important;
+	        color: #2446b6 !important;
+	        font-weight: 700;
+	        text-align: center;
+	        border: 1px solid #d8e3f3 !important;
+	    }
+	
+	    .student-timetable-panel .mini-timetable-table td {
+	        background: #fff;
+	        border: 1px solid #dee2e6 !important;
+	        text-align: center;
+	        vertical-align: middle;
+	        height: 78px;
+	        font-size: 16px;
+	        color: #222;
+	    }
+	
+	    .student-timetable-panel .mini-subject {
+	        font-size: 15px;
+	        font-weight: 600;
+	        color: #1f2937;
+	    }
+	
+	    .student-timetable-panel .mini-period-col {
+	        width: 64px;
+	        font-size: 15px;
+	        font-weight: 700;
+	        background: #f8fafc;
+	    }
+	
+	    /* 오른쪽 카드 */
+	    .summary-card .card-header {
+	        padding: 16px 20px;
+	        border-bottom: 1px solid #e5e7eb;
+	        background: transparent;
+	    }
+	
+	    .summary-card .card-header h2 {
+	        font-weight: 800;
+	        font-size: 1.5rem;
+	        margin: 0;
+	        color: #1f2937;
+	    }
+	
+	    .summary-card .card-body {
+	        padding: 18px 20px;
+	    }
+	
+	    .summary-list {
+	        list-style: none;
+	        margin: 0;
+	        padding: 0;
+	    }
+	
+	    .summary-item {
+	        padding: 14px 0;
+	        border-bottom: 1px solid #edf1f5;
+	    }
+	
+	    .summary-item:last-child {
+	        border-bottom: none;
+	    }
+	
+	    .summary-title {
+	        font-weight: 700;
+	        font-size: 1rem;
+	        color: #222;
+	        margin-bottom: 4px;
+	    }
+	
+	    .summary-course {
+	        font-size: 0.9rem;
+	        color: #6b7280;
+	        margin-bottom: 4px;
+	    }
+	
+	    .summary-date {
+	        font-size: 0.84rem;
+	        color: #94a3b8;
+	    }
+	
+	    .summary-empty {
+	        color: #888;
+	        text-align: center;
+	        padding: 20px 0;
+	        font-size: 0.95rem;
+	    }
+	
+	    @media (max-width: 991px) {
+	        .student-timetable-panel .mini-timetable-header h3 {
+	            font-size: 1.6rem;
+	        }
+	
+	        .student-timetable-panel .mini-timetable-table th,
+	        .student-timetable-panel .mini-timetable-table td {
+	            height: 68px;
+	            font-size: 14px;
+	        }
+	
+	        .student-timetable-panel .mini-subject {
+	            font-size: 14px;
+	        }
+	    }
+	    
+	    .student-timetable-panel {
+		    padding: 28px 28px 20px 36px;
+		}
+	    
+	    /* 중앙 영역 좌측 여백 추가 */
+		#layoutSidenav_content {
+		    padding: 28px 32px !important;
+		}
+		
+		/* ========================= */
+		/* 버튼 통일 */
+		/* ========================= */
+		.btn {
+		    border-radius: 10px !important;
+		    font-weight: 600;
+		    padding: 8px 16px;
+		}
+		
+		/* primary */
+		.btn-primary {
+		    background: linear-gradient(135deg, #3b82f6, #1e40af) !important;
+		    border: none !important;
+		    color: #fff !important;
+		}
+		
+		.btn-primary:hover {
+		    filter: brightness(0.95);
+		}
+		
+		/* secondary */
+		.btn-secondary {
+		    background: #e9ecef !important;
+		    border: none !important;
+		    color: #333 !important;
+		}
+		
+		.btn-secondary:hover {
+		    background: #dee2e6 !important;
+		}
+		
+		/* outline */
+		.btn-outline-primary {
+		    border: 1px solid #3b82f6 !important;
+		    color: #3b82f6 !important;
+		}
+		
+		.btn-outline-primary:hover {
+		    background: #3b82f6 !important;
+		    color: #fff !important;
+		}
+		
+		.card,
+		.student-timetable-panel,
+		.summary-card {
+		    box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+		}
+		
+		.card-header,
+		.summary-card .card-header {
+		    font-size: 1.3rem;
+		    font-weight: 800;
+		    color: #1f2937;
+		}
+		.summary-card .card-header h2 {
+		    border-left: 4px solid #3b82f6;
+		    padding-left: 10px;
+		}
+		.student-timetable-panel .mini-timetable-header h3 {
+		    border-left: 4px solid #3b82f6;
+		    padding-left: 10px;
+		}
+		.mini-timetable-table tbody tr:hover {
+		    background-color: #f1f5f9;
+		}
+	</style>
 </head>
 <body class="bg-light">
 <div class="container my-4 student-classroom-wrap">

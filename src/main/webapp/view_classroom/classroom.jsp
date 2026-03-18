@@ -299,4 +299,5 @@ String name = (String) session.getAttribute("name");
 	<script src="../js/datatables-simple-demo.js"></script>
 	<jsp:include page="/common/floatingWidgets.jsp" />
 </body>
+	<link href="<%=contextPath%>/css/classroom.css" rel="stylesheet" />
 </html>

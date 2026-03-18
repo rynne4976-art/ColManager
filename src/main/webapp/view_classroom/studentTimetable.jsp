@@ -3,40 +3,43 @@
 <%
     String contextPath = request.getContextPath();
 %>
-
-<div class="student-timetable-wrap">
-    <h2 class="student-timetable-title">내 주간 시간표</h2>
-    
-    <p id="timetable-empty-message" style="display:none; color:#666; margin-bottom:15px;">
-        현재 표시할 시간표가 없습니다.
-    </p>
-
-    <div class="student-timetable-box">
-        <table class="student-timetable-table">
-            <thead>
-                <tr>
-                    <th class="period-col">교시</th>
-                    <th class="day-header" data-day="MON">월</th>
-                    <th class="day-header" data-day="TUE">화</th>
-                    <th class="day-header" data-day="WED">수</th>
-                    <th class="day-header" data-day="THU">목</th>
-                    <th class="day-header" data-day="FRI">금</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (int i = 1; i <= 9; i++) { %>
-                <tr>
-                    <td class="period-col"><%= i %>교시</td>
-                    <td id="MON_<%= i %>" class="timetable-cell" data-day="MON" data-period="<%= i %>"></td>
-                    <td id="TUE_<%= i %>" class="timetable-cell" data-day="TUE" data-period="<%= i %>"></td>
-                    <td id="WED_<%= i %>" class="timetable-cell" data-day="WED" data-period="<%= i %>"></td>
-                    <td id="THU_<%= i %>" class="timetable-cell" data-day="THU" data-period="<%= i %>"></td>
-                    <td id="FRI_<%= i %>" class="timetable-cell" data-day="FRI" data-period="<%= i %>"></td>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
+<div class="student-classroom-wrap">
+    <div class="text-center mb-4">
+        <h1 class="display-4">주간 시간표</h1>
     </div>
+	<div class="timetable-card">
+	    
+	    <p id="timetable-empty-message" style="display:none; color:#666; margin-bottom:15px;">
+	        현재 표시할 시간표가 없습니다.
+	    </p>
+	
+	    <div class="student-timetable-box">
+	        <table class="student-timetable-table">
+	            <thead>
+	                <tr>
+	                    <th class="period-col">교시</th>
+	                    <th class="day-header" data-day="MON">월</th>
+	                    <th class="day-header" data-day="TUE">화</th>
+	                    <th class="day-header" data-day="WED">수</th>
+	                    <th class="day-header" data-day="THU">목</th>
+	                    <th class="day-header" data-day="FRI">금</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <% for (int i = 1; i <= 9; i++) { %>
+	                <tr>
+	                    <td class="period-col"><%= i %>교시</td>
+	                    <td id="MON_<%= i %>" class="timetable-cell" data-day="MON" data-period="<%= i %>"></td>
+	                    <td id="TUE_<%= i %>" class="timetable-cell" data-day="TUE" data-period="<%= i %>"></td>
+	                    <td id="WED_<%= i %>" class="timetable-cell" data-day="WED" data-period="<%= i %>"></td>
+	                    <td id="THU_<%= i %>" class="timetable-cell" data-day="THU" data-period="<%= i %>"></td>
+	                    <td id="FRI_<%= i %>" class="timetable-cell" data-day="FRI" data-period="<%= i %>"></td>
+	                </tr>
+	                <% } %>
+	            </tbody>
+	        </table>
+	    </div>
+	</div>
 </div>
 
 <style>

@@ -5,12 +5,11 @@
 
 <div class="attendance-page-wrap">
     <div class="text-center mb-4">
-        <h1 class="display-4">출석 확인</h1>
+        <h1 class="display-4"><i class="fas fa-calendar-check me-1"></i>  출석 확인</h1>
     </div>
     <div class="attendance-card">
         <div class="inner-card">
             <div class="card-header">
-                <i class="fas fa-calendar-check me-1"></i>
                 내 출결 현황
             </div>
 

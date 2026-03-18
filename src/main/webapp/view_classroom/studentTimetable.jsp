@@ -5,7 +5,7 @@
 %>
 <div class="student-classroom-wrap">
     <div class="text-center mb-4">
-        <h1 class="display-4">주간 시간표</h1>
+        <h1 class="display-4"><i class="fas fa-calendar-alt"></i>  주간 시간표</h1>
     </div>
 	<div class="timetable-card">
 	    

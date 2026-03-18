@@ -58,7 +58,10 @@
 		        <%= formattedStartDate %> ~ <%= formattedEndDate %>
 		    </div>
         </c:if>
-
+        
+    <div class="text-center mb-4">
+        <h1 class="display-4"><i class="fas fa-pen-to-square"></i>  수강 신청</h1>
+    </div>
         <div class="card shadow-sm">
             <h2 class="text-center mb-4 mt-4">수강 목록</h2>
             <div class="card-body">

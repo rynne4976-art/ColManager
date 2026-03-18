@@ -1388,6 +1388,7 @@ public class ClassroomController extends HttpServlet {
 	    	    out.print(timetableArray.toJSONString());
 	    	    out.flush();
 	    	    out.close();
+	    	    
 	    	    return;
 	    	    
 	    	case "/studentTimetableMiniData.do":

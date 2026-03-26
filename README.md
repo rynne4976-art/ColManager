@@ -272,8 +272,25 @@ ColManager/
 ---
 ## 6. 📊 데이터베이스 구조
 
-<img width="1676" height="1245" alt="ColManager edumanager sql" src="https://github.com/user-attachments/assets/445ae599-905e-401a-a9a2-cdf70e88a627" />
+<img width="1676" height="1245" alt="ColManager edumanager sql" src="https://github.com/user-attachments/assets/dc1df32f-a15d-4b5e-a853-1a5c4f1c4f2b" />
 
+
+---
+> ### 📊 관계 정리
+
+| 관계 | 설명 |
+|------|------|
+| User → Student / Professor / Admin | 1:1 (역할별 상세 정보) | 
+| User → Book_post / Book_reply | 1:N (게시글 및 댓글 작성) | 
+| Book_post → Book_reply / Book_image| 1:N (댓글 및 이미지) | 
+| Course → Enrollment / Grade / Attendance | 1:N (수강, 성적, 출결 관리) | 
+| Student → Enrollment / Grade / Attendance |1:N (학생 기준 학사 정보) | 
+| Course → Assignment → Submission | 1:N (과제 및 제출 관리) | 
+| Submission → Submission_file | 1:N (제출 파일) | 
+| Course → Course_timetable | 1:N (강의 시간표) | 
+| Course → Course_evaluation | 1:N (강의 평가) | 
+| Major → Student / Professor | 1:N (전공 소속) | 
+| Course → Classroom | N:1 (강의실 배정) |
 
 ---
 ## 7. 📡 API 명세 요약 

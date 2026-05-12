@@ -293,7 +293,7 @@ ColManager/
 | Course → Classroom | N:1 (강의실 배정) |
 
 ---
-## 7. 📡 API 명세 요약 
+## 7. 📡 API 명세 
 
 >### 🔐 회원 기능
 | Method | URL | 설명 | 
